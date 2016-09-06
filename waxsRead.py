@@ -337,8 +337,8 @@ def select_curves(h5file, Reduction_parameters):
                     std_data = f[run+'/Averaged/'+delay+'/Stds'][:,1:]
                     mean_data =  f[run+'/Averaged/'+delay+'/Means'][:,1:]
  
-                    # assume to begin with that curveis the one
-                    # with the lowest overall std. The do a numerical comparison
+                    # assume to begin with that  the best curve is the one
+                    # with the lowest overall std. Then do a numerical comparison
                     # and select the curve with highest amount curves included
                     # could throw away low Q out for this work
                     numbers_scan = Reduction_parameters['scan_width']
