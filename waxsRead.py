@@ -267,7 +267,7 @@ def data_merger(h5file, Reduction_parameters):
     reference_flag = Reduction_parameters['reference_flag']
     sort_debug = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','x','y','z', 'zz', 'zzz','zzzz',
                   'zzzzz','zzzzzz'] # reference is always first
-    grouped_retrive_strings, unique_time_delays, time_seconds = return_all_delays(destination_folder, h5name)
+    grouped_retrive_strings, unique_time_delays, time_seconds = return_all_delays(h5file)
     with h5py.File(h5file, 'a') as f:
         if 'Global' in f:
             del f['Global']
@@ -282,7 +282,7 @@ def data_merger(h5file, Reduction_parameters):
             else:
                 group_path = 'Global/Merged/{debug}_difference_{delay}'.format(debug=sort_debug[num], delay=delay)
             f[group_path] = data_set
-    f['Global/Merged/Time_seconds'] = time_seconds
+        f['Global/Merged/Time_seconds'] = time_seconds
                 
     
 
@@ -345,12 +345,17 @@ def select_curves(h5file, Reduction_parameters):
                     summed_std = [np.sum(std_data[:,num]) for num in range(numbers_scan)]
                     min_std_index = np.argmin(summed_std)
                     data_comparisons = [np.allclose(mean_data[:,min_std_index], mean_data[:,num]) for num in range(numbers_scan)]
-                    
-                    best_index = np.nonzero(data_comparisons)[-1]
+                    print('Comparisons:')                    
+                    print(data_comparisons)
+                    best_index = np.nonzero(data_comparisons)[0][-1] # if several are allclose then used the mean with most curves in
+                    print('Best index:')
+                    print(best_index)
                     selected_curves.append(np.squeeze(mean_data[:,best_index]))
                     selected_curves_std.append(np.squeeze(std_data[:,best_index]))
-                    
-                    
+                    print(len(selected_curves))
+                
+                print('Seleted curves:')
+                print(np.shape(np.array(selected_curves[0]).T))
                 mean_write_string = run+'/Data_set/IQ_curves'
                 std_write_string = run+'/Data_set/Std_curves'
                 f[mean_write_string] = np.array(selected_curves).T

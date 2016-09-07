@@ -55,7 +55,7 @@ def detect_outliers(data_set, number_multipliers, thresshold_as_outlier):
             stds.append(np.std(data_set[:,~index_outlier_curves[:,num]],axis=1)/np.sqrt(np.shape(data)[1])) # divide standard dev. by sqrt(n) to get stand Err.
             #print(len(curves_averaged))
         else:
-            zero_vector = np.atleast_2d(np.zeros(np.shape(median_curve))).T
+            zero_vector = np.zeros(np.shape(median_curve)).T #np.atleast_2d(
             curves_averaged.append(zero_vector)
             means.append(zero_vector)
             stds.append(zero_vector)

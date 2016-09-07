@@ -16,12 +16,12 @@ from OTUtility import detect_outliers
 #%%
 
 
-def return_all_delays(destination_folder, h5name):
+def return_all_delays(h5file):
 
-    file_name = destination_folder + '\\' + h5name
+    #file_name = destination_folder + '\\' + h5name
     delay_list = []
     retrieve_string = []
-    with h5py.File(file_name, 'a') as f:           
+    with h5py.File(h5file, 'a') as f:           
         for run in f:
             if run == 'Global':
                 continue

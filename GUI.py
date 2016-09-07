@@ -24,7 +24,8 @@ from expUtility import *
 from OTUtility import *
 #%% 
     
-ui_file = 'C:\\Users\\mpederse\\Documents\\Python_scripts\\new_waxsGUI\\main_window.ui'
+#ui_file = 'C:\\Users\\mpederse\\Documents\\Python_scripts\\new_waxsGUI\\main_window.ui'
+ui_file = 'C:\\Users\\kurt\\Documents\\GitHub\\newGUI\\main_window.ui'    
 Ui_PlotWindow, QPlotWindow = loadUiType(ui_file )
 separator = '\\'   
 
@@ -60,7 +61,8 @@ class Main(QPlotWindow, Ui_PlotWindow):
         #self.Raw_SVD_cap.setText(str(20))
         #self.lowRankCap.setText(str(4))
         #self.Destination_folder.setText('C:\\Users\\mpederse\\Documents\\Python_scripts\\Gui_general')
-        self.inp_data_folders.setText('C:\\newWaxs_data\\run36, C:\\newWaxs_data\\run38, C:\\newWaxs_data\\run42') #, C:\\newWaxs_data\\run38, C:\\newWaxs_data\\run42')
+        #self.inp_data_folders.setText('C:\\newWaxs_data\\run36, C:\\newWaxs_data\\run38, C:\\newWaxs_data\\run42') #, C:\\newWaxs_data\\run38, C:\\newWaxs_data\\run42')
+        self.inp_data_folders.setText('C:\\data\\run38, C:\\data\\run42')       
         self.inp_sample_name.setText('test3')
         self.inp_logfiles.setText('Ru3CO12.log')
         self.inp_detector_dist.setText('0.035')
