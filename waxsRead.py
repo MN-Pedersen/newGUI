@@ -222,9 +222,9 @@ def calculate_references(h5file, Reduction_parameters):
 #%%
 
 def store_averaged(h5file, Reduction_parameters):
-    iterations = ['a_First', 'b_Second', 'c_Third', 'd_Fourth', 'e_Fifth']
+    #iterations = ['a_First', 'b_Second', 'c_Third', 'd_Fourth', 'e_Fifth']
     num_outliers = Reduction_parameters['num_outliers']/100*Reduction_parameters['num_points'] 
-    num_multipliers = Reduction_parameters['scan_width']
+    #num_multipliers = Reduction_parameters['scan_width']
     with h5py.File(h5file, 'a') as f:           
         for run in f:
             if 'Averaged/' in f[run]:
@@ -239,18 +239,19 @@ def store_averaged(h5file, Reduction_parameters):
                 else:
                     Qvector = np.atleast_2d(f[run+'/Reduced/'+reduced_data][:,0]).T
                     difference_curves = f[run+'/Reduced/'+reduced_data][:,1:]
-                    variables = detect_outliers(difference_curves, num_multipliers, num_outliers)
+                    variables = detect_outliers(difference_curves, num_outliers)
                     #print(np.shape(variables))
-                    variable_names = ['Selected_curves', 'Outliers', 'Means', 'Stds']
+                    variable_names = ['Selected_curves', 'Outliers', 'Mean', 'Errorbars']
                     
                     for num, name in enumerate(variable_names):
                         if (name == 'Selected_curves') or (name == 'Outliers'):
-                            for num2 in range(num_multipliers):
-                                data_string = '{run}/Averaged/{delay}/{variable_name}/{iteration}'.format(
-                                                run=run, delay=reduced_data, variable_name=name, iteration=iterations[num2])
-                                data = variables[num][num2]
-                                data_with_Q = np.column_stack((Qvector,data))
-                                f[data_string] = data_with_Q
+                            data_string = '{run}/Averaged/{delay}/{variable_name}'.format(
+                                                run=run, delay=reduced_data, variable_name=name)
+                            data = np.array(variables[num]).squeeze()
+                            print('IQ/Errorbars shape')
+                            print(np.shape(data))
+                            data_with_Q = np.column_stack((Qvector,data))
+                            f[data_string] = data_with_Q
                         else:
                             data_string = '{run}/Averaged/{delay}/{variable_name}'.format(
                                                 run=run, delay=reduced_data, variable_name=name)
@@ -289,8 +290,8 @@ def data_merger(h5file, Reduction_parameters):
 #%%
 
 def merged_averager(h5file, Reduction_parameters):
-    iterations =  ['a_First', 'b_Second', 'c_Third', 'd_Fourth', 'e_Fifth']
-    num_multipliers = Reduction_parameters['scan_width']
+    #iterations =  ['a_First', 'b_Second', 'c_Third', 'd_Fourth', 'e_Fifth']
+    #num_multipliers = Reduction_parameters['scan_width']
     num_outliers = Reduction_parameters['num_outliers']
     with h5py.File(h5file, 'a') as f:
         for num, delay in enumerate(f['Global/Merged/']):
@@ -299,17 +300,16 @@ def merged_averager(h5file, Reduction_parameters):
             
             Qvector = f['Global/Merged/'+delay][:,0]
             IQ = f['Global/Merged/'+delay][:,1:]
-            variables = detect_outliers(IQ, num_multipliers, num_outliers)
-            variable_names = ['Selected_curves', 'Outliers', 'Means', 'Stds']
+            variables = detect_outliers(IQ, num_outliers)
+            variable_names = ['Selected_curves', 'Outliers', 'Mean', 'Errorbars']
                     
             for num, name in enumerate(variable_names):
                 if (name == 'Selected_curves') or (name == 'Outliers'):
-                    for num2 in range(num_multipliers):
-                        data_string = 'Global/Averaged/{delay}/{variable_name}/{iteration}'.format(
-                                                delay=delay, variable_name=name, iteration=iterations[num2])
-                        data = variables[num][num2]
-                        data_with_Q = np.column_stack((Qvector,data))
-                        f[data_string] = data_with_Q
+                    data_string = 'Global/Averaged/{delay}/{variable_name}/'.format(
+                                                delay=delay, variable_name=name)
+                    data = np.array(variables[num]).squeeze()
+                    data_with_Q = np.column_stack((Qvector,data))
+                    f[data_string] = data_with_Q
                 else:
                     data_string = 'Global/Averaged/{delay}/{variable_name}'.format(
                                                 delay=delay, variable_name=name)
@@ -320,6 +320,16 @@ def merged_averager(h5file, Reduction_parameters):
 #%%
 
 def select_curves(h5file, Reduction_parameters):
+    """
+    
+    This function was introduced in earlier versions where several averaged
+    curves where calculated, and the best was selected. Now it is not needed,
+    but kept here for future improvements
+    
+    Sept. 8th 2016
+    
+    
+    """
     selected_curves = []
     selected_curves_std = []
     with h5py.File(h5file, 'a') as f:           
@@ -329,35 +339,19 @@ def select_curves(h5file, Reduction_parameters):
                     del f[run+'/Data_set']
                 
                 for num, delay in enumerate(f[run+'/Averaged']):
-                    Qvector = f[run+'/Averaged/'+delay+'/Stds'][:,0]
+                    Qvector = f[run+'/Averaged/'+delay+'/Errorbars'][:,0]
                     if num == 0:
                         selected_curves.append(Qvector)
                         selected_curves_std.append(Qvector)
                     
-                    std_data = f[run+'/Averaged/'+delay+'/Stds'][:,1:]
-                    mean_data =  f[run+'/Averaged/'+delay+'/Means'][:,1:]
+                    std_data = f[run+'/Averaged/'+delay+'/Errorbars'][:,1]
+                    mean_data =  f[run+'/Averaged/'+delay+'/Means'][:,1]
  
-                    # assume to begin with that  the best curve is the one
-                    # with the lowest overall std. Then do a numerical comparison
-                    # and select the curve with highest amount curves included
-                    # could throw away low Q out for this work
-                    numbers_scan = Reduction_parameters['scan_width']
-                    summed_std = [np.sum(std_data[:,num]) for num in range(numbers_scan)]
-                    min_std_index = np.argmin(summed_std)
-                    data_comparisons = [np.allclose(mean_data[:,min_std_index], mean_data[:,num]) for num in range(numbers_scan)]
-                    print('Comparisons:')                    
-                    print(data_comparisons)
-                    best_index = np.nonzero(data_comparisons)[0][-1] # if several are allclose then used the mean with most curves in
-                    print('Best index:')
-                    print(best_index)
-                    selected_curves.append(np.squeeze(mean_data[:,best_index]))
-                    selected_curves_std.append(np.squeeze(std_data[:,best_index]))
-                    print(len(selected_curves))
-                
-                print('Seleted curves:')
-                print(np.shape(np.array(selected_curves[0]).T))
+                    selected_curves.append(np.squeeze(mean_data))
+                    selected_curves_std.append(np.squeeze(std_data))
+
                 mean_write_string = run+'/Data_set/IQ_curves'
-                std_write_string = run+'/Data_set/Std_curves'
+                std_write_string = run+'/Data_set/Errorbars'
                 f[mean_write_string] = np.array(selected_curves).T
                 f[std_write_string] = np.array(selected_curves_std).T    
 

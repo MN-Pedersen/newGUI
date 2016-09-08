@@ -24,8 +24,8 @@ from expUtility import *
 from OTUtility import *
 #%% 
     
-#ui_file = 'C:\\Users\\mpederse\\Documents\\Python_scripts\\new_waxsGUI\\main_window.ui'
-ui_file = 'C:\\Users\\kurt\\Documents\\GitHub\\newGUI\\main_window.ui'    
+ui_file = 'C:\\Users\\mpederse\\Documents\\Python_scripts\\new_waxsGUI\\main_window.ui'
+#ui_file = 'C:\\Users\\kurt\\Documents\\GitHub\\newGUI\\main_window.ui'    
 Ui_PlotWindow, QPlotWindow = loadUiType(ui_file )
 separator = '\\'   
 
@@ -61,8 +61,8 @@ class Main(QPlotWindow, Ui_PlotWindow):
         #self.Raw_SVD_cap.setText(str(20))
         #self.lowRankCap.setText(str(4))
         #self.Destination_folder.setText('C:\\Users\\mpederse\\Documents\\Python_scripts\\Gui_general')
-        #self.inp_data_folders.setText('C:\\newWaxs_data\\run36, C:\\newWaxs_data\\run38, C:\\newWaxs_data\\run42') #, C:\\newWaxs_data\\run38, C:\\newWaxs_data\\run42')
-        self.inp_data_folders.setText('C:\\data\\run38, C:\\data\\run42')       
+        self.inp_data_folders.setText('C:\\newWaxs_data\\run38, C:\\newWaxs_data\\run42') #, C:\\newWaxs_data\\run38, C:\\newWaxs_data\\run42')C:\\newWaxs_data\\run36
+        #self.inp_data_folders.setText('C:\\data\\run38, C:\\data\\run42')       
         self.inp_sample_name.setText('test3')
         self.inp_logfiles.setText('Ru3CO12.log')
         self.inp_detector_dist.setText('0.035')
@@ -75,7 +75,7 @@ class Main(QPlotWindow, Ui_PlotWindow):
         self.inp_Qmax.setText('8')
         self.inp_reference_flag.setText('-3ns')
         self.inp_num_outl.setText('10')
-        self.inp_scan_width.setText('5')
+        #self.inp_scan_width.setText('5')
         #self.inputList.setText('100ps, 1us')
         #self.refDelay.setText('-3ns')
         #self.includeFirstLast.setCheckState(QtCore.Qt.Checked)
@@ -125,7 +125,7 @@ class Main(QPlotWindow, Ui_PlotWindow):
         norm_Qmax = float(self.inp_Qmax.text())
         reference_flag = str(self.inp_reference_flag.text())
         num_outliers = float(self.inp_num_outl.text())
-        scan_width = int(self.inp_scan_width.text())
+        #scan_width = int(self.inp_scan_width.text())
         num_points = 1200
         
         # non-packed variables
@@ -141,10 +141,10 @@ class Main(QPlotWindow, Ui_PlotWindow):
         
         exp_variable_names = ['detector_dist', 'detector_bin', 'Xray_energy', 'Xray_position',
                               'sample_thickness', 'solvent_abs', 'norm_Qmin', 'norm_Qmax', 'reference_flag', 
-                              'num_outliers', 'scan_width', 'num_points']
+                              'num_outliers', 'num_points'] #'scan_width'
         exp_variables = [detector_dist, detector_bin, Xray_energy, Xray_position, sample_thickness,
-                         solvent_abs, norm_Qmin, norm_Qmax, reference_flag, num_outliers, scan_width,
-                         num_points]
+                         solvent_abs, norm_Qmin, norm_Qmax, reference_flag, num_outliers,
+                         num_points] # scan_width
         Reduction_parameters = {}
         
         for num, name in enumerate(exp_variable_names):
