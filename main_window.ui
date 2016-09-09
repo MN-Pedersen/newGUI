@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>800</width>
-    <height>600</height>
+    <height>597</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -1063,30 +1063,50 @@ p, li { white-space: pre-wrap; }
      <string>Blue/yellow colour scale</string>
     </property>
    </widget>
-   <widget class="QCheckBox" name="translate_curves">
+   <widget class="QCheckBox" name="translate_merged_curves">
     <property name="geometry">
      <rect>
       <x>550</x>
       <y>550</y>
-      <width>191</width>
+      <width>151</width>
       <height>17</height>
      </rect>
     </property>
     <property name="text">
-     <string>Translate curves vertically</string>
+     <string>Translate merged curves</string>
     </property>
    </widget>
    <widget class="QPushButton" name="plot_standard">
     <property name="geometry">
      <rect>
-      <x>550</x>
-      <y>570</y>
-      <width>81</width>
-      <height>23</height>
+      <x>700</x>
+      <y>530</y>
+      <width>91</width>
+      <height>61</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>16</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
     </property>
     <property name="text">
      <string>Plot</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="translate_datasets">
+    <property name="geometry">
+     <rect>
+      <x>550</x>
+      <y>570</y>
+      <width>151</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Translate data set curves</string>
     </property>
    </widget>
    <zorder>widget_2</zorder>
@@ -1104,8 +1124,9 @@ p, li { white-space: pre-wrap; }
    <zorder>inp_individual_datasets</zorder>
    <zorder>label_10</zorder>
    <zorder>blue_yellow</zorder>
-   <zorder>translate_curves</zorder>
+   <zorder>translate_merged_curves</zorder>
    <zorder>plot_standard</zorder>
+   <zorder>translate_datasets</zorder>
   </widget>
  </widget>
  <resources/>

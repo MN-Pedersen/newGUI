@@ -22,6 +22,7 @@ from waxsRead import *
 from poolUtility import *
 from expUtility import *
 from OTUtility import *
+from plotUtility import prepare_merged_data
 #%% 
     
 ui_file = 'C:\\Users\\mpederse\\Documents\\Python_scripts\\new_waxsGUI\\main_window.ui'
@@ -81,11 +82,20 @@ class Main(QPlotWindow, Ui_PlotWindow):
         #self.includeFirstLast.setCheckState(QtCore.Qt.Checked)
         
         
+        # preparing global variables
+        self.Reduction_parameters = self.get_all_parameters()
+        if self.hdf5_append == '':
+            destination_folder = list_folders[-1]
+        else:
+            destination_folder = self.hdf5_append
+        self.h5file = destination_folder + separator + self.sample_name        
+        
+        
+        
     
         
         
     def Data_reduction(self):
-        Reduction_parameters = self.get_all_parameters()
         list_folders = self.data_folders.replace(' ','').split(sep=',')
         run_names = [directory.split(sep=separator)[-1] for directory in list_folders]        
         list_logfiles = self.log_files.replace(' ','').split(sep=',')
@@ -97,16 +107,22 @@ class Main(QPlotWindow, Ui_PlotWindow):
             else:
                 raise ValueError('Please insure that logfiles are specified correctly\nEither one for all folders or one for each folder')
             
-        if self.hdf5_append == '':
-            destination_folder = list_folders[-1]
-        else:
-            destination_folder = self.hdf5_append
-        h5file = destination_folder + separator + self.sample_name
-        
         for num, directory in enumerate(list_folders):
-            average_and_write(directory, list_logfiles[num], run_names[num], h5file, Reduction_parameters)
+            average_and_write(directory, list_logfiles[num], run_names[num], self.h5file, Reduction_parameters)
         
         reduce_data(h5file, Reduction_parameters)
+        
+        
+        
+    def produce_standard_plot():
+
+        
+        if individual_datasets.checkState():
+            data_sets = str(self.inp_individual_datasets.text).replace(' ','')
+            data_sets = data_sets.split(sep=',')
+            
+        if merged_plots.checkState():
+            plot_data = prepare_merged_data(self.h5file)
         
     def ActionMaskSelect(self):
         folder = str(QtGui.QFileDialog.getOpenFileName())
@@ -151,6 +167,13 @@ class Main(QPlotWindow, Ui_PlotWindow):
             Reduction_parameters[name] = exp_variables[num]
             
         return Reduction_parameters
+        
+
+            
+    
+            
+            
+        
 
 
 

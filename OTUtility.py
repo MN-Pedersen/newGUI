@@ -33,7 +33,7 @@ def detect_outliers(data_set, thresshold_as_outlier):
     
     for num in range(np.shape(data_set)[1]):
         discrepancy = np.abs(data_set[:,num]-median_curve)
-        points_over_thresshold = np.sum(discrepancy >= multiplier*std_all_data)
+        points_over_thresshold = np.sum(discrepancy >= np.abs(median_curve)+multiplier*std_all_data)
             
         if points_over_thresshold >= thresshold_as_outlier:
             index_outlier_curves[num] = True

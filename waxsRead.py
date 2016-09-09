@@ -292,7 +292,7 @@ def data_merger(h5file, Reduction_parameters):
 def merged_averager(h5file, Reduction_parameters):
     #iterations =  ['a_First', 'b_Second', 'c_Third', 'd_Fourth', 'e_Fifth']
     #num_multipliers = Reduction_parameters['scan_width']
-    num_outliers = Reduction_parameters['num_outliers']
+    num_outliers = Reduction_parameters['num_outliers']/100*Reduction_parameters['num_points'] 
     with h5py.File(h5file, 'a') as f:
         for num, delay in enumerate(f['Global/Merged/']):
             if delay == 'Time_seconds':
@@ -345,7 +345,7 @@ def select_curves(h5file, Reduction_parameters):
                         selected_curves_std.append(Qvector)
                     
                     std_data = f[run+'/Averaged/'+delay+'/Errorbars'][:,1]
-                    mean_data =  f[run+'/Averaged/'+delay+'/Means'][:,1]
+                    mean_data =  f[run+'/Averaged/'+delay+'/Mean'][:,1]
  
                     selected_curves.append(np.squeeze(mean_data))
                     selected_curves_std.append(np.squeeze(std_data))
