@@ -23,11 +23,9 @@ from PyQt4.QtCore import SIGNAL
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import numpy as np
-import re
-import h5py
 #%%
 
-ui2_file = 'replot_three.ui'
+ui2_file = 'standard_plot.ui'
 # my_path = # used only in the dummy version 
 Ui_PlotWindow, QPlotWindow = loadUiType(ui2_file )
 # info_dict = {'path': my_path} # used only in the dummy version
@@ -35,7 +33,7 @@ Ui_PlotWindow, QPlotWindow = loadUiType(ui2_file )
 
 
 class PlotWindow(QPlotWindow, Ui_PlotWindow):
-    def __init__(self, info_dict):
+    def __init__(self, plot_data):
         super(PlotWindow, self).__init__()
         self.setupUi(self)
         # make a plot
@@ -57,7 +55,7 @@ class PlotWindow(QPlotWindow, Ui_PlotWindow):
         self.connect(self.Errorbars,SIGNAL("clicked()"), self.ChangeErrorbars)
 
         # *** Various settings used to configure the settings ***
-        self.my_path = info_dict['path']
+        #self.my_path = info_dict['path']
         self.Use_errorbars = False
         
         
@@ -93,13 +91,13 @@ class PlotWindow(QPlotWindow, Ui_PlotWindow):
             # error bars
             if self.dsq_state == 1:
                 for k in range(len(self.legends)): # loop necessary to assign label :(
-                    self.axes.errorbar(self.Q_plot[:,k],self.IQ_plot[:,k],self.std_plot[:,k],label=self.legends[k], color = self.curve_color[k],lw=2)
+                    self.axes.errorbar(self.Q_plot[:,k],self.IQ_plot[:,k],self.err_plot[:,k],label=self.legends[k], color = self.curve_color[k],lw=2)
             elif self.dsq_state == 2:
                 for k in range(len(self.legends)):
-                    self.axes.errorbar(self.Q_plot[:,k],self.IQ_plot[:,k]*self.Q_plot[:,k],self.std_plot[:,k]*self.Q_plot[:,k],label=self.legends[k], color = self.curve_color[k],lw=2)
+                    self.axes.errorbar(self.Q_plot[:,k],self.IQ_plot[:,k]*self.Q_plot[:,k],self.err_plot[:,k]*self.Q_plot[:,k],label=self.legends[k], color = self.curve_color[k],lw=2)
             elif self.dsq_state == 3:
                 for k in range(len(self.legends)): # loop necessary to assign label :(
-                    self.axes.errorbar(self.Q_plot[:,k],self.IQ_plot[:,k]*self.Q_plot[:,k]**2,self.std_plot[:,k]*self.Q_plot[:,k]**2,label=self.legends[k], color = self.curve_color[k],lw=2)
+                    self.axes.errorbar(self.Q_plot[:,k],self.IQ_plot[:,k]*self.Q_plot[:,k]**2,self.err_plot[:,k]*self.Q_plot[:,k]**2,label=self.legends[k], color = self.curve_color[k],lw=2)
 
         # adjust axis'
         self.First_round_check = False # first pass of PlotListUpdate complete
@@ -134,26 +132,25 @@ class PlotWindow(QPlotWindow, Ui_PlotWindow):
         # empty variables
         IQ_plot = []
         Q_plot = []
-        std_plot = []
-        legends = []
+        err_plot = []
+        legends_plot = []
         curve_color = [] # sorry UK
         # design colormap - do it here so they are local. This step is fast, so it can be repeated
         num_files = len(self.file_names)
 #        print num_files
         colors = [cm.jet(k/float(num_files),1) for k in range(num_files)]
-        for k in range(self.CurvesToPlot.count()):
-            if self.CurvesToPlot.item(k).checkState() == 2:
-                Q_plot.append(self.Q[k,:])
-                IQ_plot.append(self.IQ[k,:])
-                std_plot.append(self.std[k,:])
-                legend_string = self.file_names[k] + ' ' + self.accepted[k]
-                legends.append(legend_string)
-                curve_color.append(colors[k])
+        for num in range(self.CurvesToPlot.count()):
+            if self.CurvesToPlot.item(num).checkState() == 2:
+                Q_plot.append(self.Q[num,:])
+                IQ_plot.append(self.IQ[num,:])
+                err_plot.append(self.err[num,:])
+                legends_plot.append(self.legends[num])
+                curve_color.append(colors[num])
         # define the data
         self.Q_plot = np.array(Q_plot).T
         self.IQ_plot = np.array(IQ_plot).T
-        self.std_plot = np.array(std_plot).T
-        self.legends = legends
+        self.err_plot = np.array(err_plot).T
+        self.legends_plot = legends_plot
         self.curve_color = curve_color
         # sort the data
 #        self.data_sorter()        
@@ -190,13 +187,12 @@ class PlotWindow(QPlotWindow, Ui_PlotWindow):
     # Initials stuff = run only once! 
     # *** FIX FIX FIX ***            
     # load the data  
-    def Data_reader(self):
-        with h5py.File(XXXXXXXX) as f:
-            self.Q = f['XXXXXXXX'][:,0]
-            self.IQ = f['XXXXXXXX'][:,1:]
-            self.std = f['XXXXXXXX'][:,1:]
-            self.file_names = f['XXXXXXXX'][:]
-            self.Accepted = f['XXXXXXX'][:]
+    def Data_reader(self, plot_data):
+        self.Q = plot_data['Q']
+        self.IQ = plot_data['IQ']
+        self.err = plot_data['errors']
+        self.file_names = plot_data['file_names']
+        self.legends = plot_data['legends']
             
         for k, item in enumerate(self.file_names):
             self.CurvesToPlot.addItem(item)

@@ -23,10 +23,11 @@ from poolUtility import *
 from expUtility import *
 from OTUtility import *
 from plotUtility import prepare_merged_data
+from plot1 import PlotWindow
 #%% 
     
-ui_file = 'C:\\Users\\mpederse\\Documents\\Python_scripts\\new_waxsGUI\\main_window.ui'
-#ui_file = 'C:\\Users\\kurt\\Documents\\GitHub\\newGUI\\main_window.ui'    
+#ui_file = 'C:\\Users\\mpederse\\Documents\\Python_scripts\\new_waxsGUI\\main_window.ui'
+ui_file = 'C:\\Users\\kurt\\Documents\\GitHub\\newGUI\\main_window.ui'    
 Ui_PlotWindow, QPlotWindow = loadUiType(ui_file )
 separator = '\\'   
 
@@ -57,6 +58,9 @@ class Main(QPlotWindow, Ui_PlotWindow):
         # write data
         self.connect(self.gogogo, SIGNAL("clicked()"), self.Data_reduction)
         
+        # standard plot
+        self.connect(self.gogogo, SIGNAL("clicked()"), self.produce_standard_plot)
+        
         
         # set default values / behavior
         #self.Raw_SVD_cap.setText(str(20))
@@ -85,7 +89,7 @@ class Main(QPlotWindow, Ui_PlotWindow):
         # preparing global variables
         self.Reduction_parameters = self.get_all_parameters()
         if self.hdf5_append == '':
-            destination_folder = list_folders[-1]
+            destination_folder = self.data_folders[-1]
         else:
             destination_folder = self.hdf5_append
         self.h5file = destination_folder + separator + self.sample_name        
@@ -114,7 +118,7 @@ class Main(QPlotWindow, Ui_PlotWindow):
         
         
         
-    def produce_standard_plot():
+    def produce_standard_plot(self):
 
         
         if individual_datasets.checkState():
@@ -123,6 +127,7 @@ class Main(QPlotWindow, Ui_PlotWindow):
             
         if merged_plots.checkState():
             plot_data = prepare_merged_data(self.h5file)
+            PlotWindow(plot_data)
         
     def ActionMaskSelect(self):
         folder = str(QtGui.QFileDialog.getOpenFileName())
@@ -149,7 +154,7 @@ class Main(QPlotWindow, Ui_PlotWindow):
         #self.laser_fluence = str(self.inp_laser_fluence.text())        
         #self.sample_conc = str(self.inp_sample_conc.text())        
         self.sample_name = str(self.inp_sample_name.text()) + '.hdf5'
-        self.data_folders = str(self.inp_data_folders.text())
+        self.data_folders = str(self.inp_data_folders.text()).replace(' ','').split(sep=',')
         self.log_files = str(self.inp_logfiles.text())
         self.hdf5_append = str(self.inp_append_hdf5.text())
         #self.numb_outliers = str(self.inp_num_outl.text())
