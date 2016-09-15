@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>796</width>
-    <height>597</height>
+    <height>603</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -1123,9 +1123,9 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>330</x>
-      <y>480</y>
+      <y>490</y>
       <width>201</width>
-      <height>31</height>
+      <height>41</height>
      </rect>
     </property>
     <property name="font">
@@ -1143,9 +1143,9 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>330</x>
-      <y>520</y>
+      <y>550</y>
       <width>201</width>
-      <height>31</height>
+      <height>41</height>
      </rect>
     </property>
     <property name="font">
@@ -1170,26 +1170,6 @@ p, li { white-space: pre-wrap; }
     </property>
     <property name="text">
      <string>Blue/yellow colour scale</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="plot_raw_data">
-    <property name="geometry">
-     <rect>
-      <x>330</x>
-      <y>560</y>
-      <width>201</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>12</pointsize>
-      <weight>75</weight>
-      <bold>true</bold>
-     </font>
-    </property>
-    <property name="text">
-     <string>Raw data analysis</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_5">
@@ -1436,7 +1416,6 @@ p, li { white-space: pre-wrap; }
    <zorder>plot_SVD_comp</zorder>
    <zorder>plot_low_rank</zorder>
    <zorder>blue_yellow_2</zorder>
-   <zorder>plot_raw_data</zorder>
    <zorder>label_5</zorder>
    <zorder>line_13</zorder>
    <zorder>line_14</zorder>

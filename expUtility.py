@@ -44,22 +44,18 @@ def get_integrator(Reduction_parameters):
 
 #%%
 
-def FunGetCorrections(two_theta, use_sample_abs, use_phos_abs, sample_thickness, sample_mu):
+def FunGetCorrections(two_theta, sample_thickness, sample_mu):
 
-    cv = np.cos(np.deg2rad(tth)) # cos value
-    if use_sample_abs:
-        sample_coeff = sample_thickness*sample_mu # coef sample
-        T = 1/csa*cv/(1-cv)*(np.exp(-csa)-np.exp(-csa/cv))
-        T0 = np.exp(-csa)
-        SampleCor = T0/T
-    else:
-        SampleCor = np.ones(cv.shape)
+    cos = np.cos(np.deg2rad(tth)) # cos value
+
+    T = 1/csa*cos/(1-cos)*(np.exp(-csa)-np.exp(-csa/cos))
+    T0 = np.exp(-csa)
+    SampleCor = T0/T
         
-    if vval['UsePhosAbs']:
-        phosphor_coeff = 40e-6*0.928    # phosphor width*phosphor mu.    
-        PhosCor = (1-np.exp(-phosphor_coeff))/(1-np.exp(-phosphor_coeff/cv))
-    else:
-        PhosCor = np.ones(cv.shape)
+
+    phosphor_coeff = 40e-6*0.928    # phosphor width*phosphor mu.    
+    PhosCor = (1-np.exp(-phosphor_coeff))/(1-np.exp(-phosphor_coeff/cos))
+
 
     Corrections = PhosCor*SampleCor
-    return Corrections, PhosCor, SampleCor
+    return Corrections
