@@ -68,7 +68,7 @@ class PlotWindow(QPlotWindow, Ui_PlotWindow):
     def Add_plot(self):
  #       print 'Add_plot'
         self.figure.clear()
-        plt.title(self.my_path)
+        plt.title('Merged Data Curves')
         plt.grid(b=True, which=u'major', axis=u'both')
         # set axis
         self.axes = self.figure.add_subplot(111)
@@ -79,25 +79,25 @@ class PlotWindow(QPlotWindow, Ui_PlotWindow):
         if not self.Use_errorbars:
             # no error bars
             if self.dsq_state == 1:
-                for k in range(len(self.legends)): # loop necessary to assign label :(
-                    self.axes.plot(self.Q_plot[:,k],self.IQ_plot[:,k],label=self.legends[k],color = self.curve_color[k],lw=2)
+                for k in range(len(self.legends_plot)): # loop necessary to assign label :(
+                    self.axes.plot(self.Q,self.IQ_plot[:,k],label=self.legends[k],color = self.curve_color[k],lw=2)
             elif self.dsq_state == 2:
-                for k in range(len(self.legends)): # loop necessary to assign label :(
-                    self.axes.plot(self.Q_plot[:,k],self.IQ_plot[:,k]*self.Q_plot[:,k],label=self.legends[k], color = self.curve_color[k],lw=2)
+                for k in range(len(self.legends_plot)): # loop necessary to assign label :(
+                    self.axes.plot(self.Q,self.IQ_plot[:,k]*self.Q,label=self.legends[k], color = self.curve_color[k],lw=2)
             elif self.dsq_state == 3:
-                for k in range(len(self.legends)): # loop necessary to assign label :(
-                    self.axes.plot(self.Q_plot[:,k],self.IQ_plot[:,k]*self.Q_plot[:,k]**2,label=self.legends[k], color = self.curve_color[k],lw=2)
+                for k in range(len(self.legends_plot)): # loop necessary to assign label :(
+                    self.axes.plot(self.Q,self.IQ_plot[:,k]*self.Q**2,label=self.legends[k], color = self.curve_color[k],lw=2)
         else:
             # error bars
             if self.dsq_state == 1:
-                for k in range(len(self.legends)): # loop necessary to assign label :(
-                    self.axes.errorbar(self.Q_plot[:,k],self.IQ_plot[:,k],self.err_plot[:,k],label=self.legends[k], color = self.curve_color[k],lw=2)
+                for k in range(len(self.legends_plot)): # loop necessary to assign label :(
+                    self.axes.errorbar(self.Q,self.IQ_plot[:,k],self.err_plot[:,k],label=self.legends[k], color = self.curve_color[k],lw=2)
             elif self.dsq_state == 2:
-                for k in range(len(self.legends)):
-                    self.axes.errorbar(self.Q_plot[:,k],self.IQ_plot[:,k]*self.Q_plot[:,k],self.err_plot[:,k]*self.Q_plot[:,k],label=self.legends[k], color = self.curve_color[k],lw=2)
+                for k in range(len(self.legends_plot)):
+                    self.axes.errorbar(self.Q,self.IQ_plot[:,k]*self.Q,self.err_plot[:,k]*self.Q,label=self.legends[k], color = self.curve_color[k],lw=2)
             elif self.dsq_state == 3:
-                for k in range(len(self.legends)): # loop necessary to assign label :(
-                    self.axes.errorbar(self.Q_plot[:,k],self.IQ_plot[:,k]*self.Q_plot[:,k]**2,self.err_plot[:,k]*self.Q_plot[:,k]**2,label=self.legends[k], color = self.curve_color[k],lw=2)
+                for k in range(len(self.legends_plot)): # loop necessary to assign label :(
+                    self.axes.errorbar(self.Q,self.IQ_plot[:,k]*self.Q**2,self.err_plot[:,k]*self.Q**2,label=self.legends[k], color = self.curve_color[k],lw=2)
 
         # adjust axis'
         self.First_round_check = False # first pass of PlotListUpdate complete
@@ -131,7 +131,7 @@ class PlotWindow(QPlotWindow, Ui_PlotWindow):
         # print 'reads'
         # empty variables
         IQ_plot = []
-        Q_plot = []
+        #Q_plot = []
         err_plot = []
         legends_plot = []
         curve_color = [] # sorry UK
@@ -141,13 +141,13 @@ class PlotWindow(QPlotWindow, Ui_PlotWindow):
         colors = [cm.jet(k/float(num_files),1) for k in range(num_files)]
         for num in range(self.CurvesToPlot.count()):
             if self.CurvesToPlot.item(num).checkState() == 2:
-                Q_plot.append(self.Q[num,:])
-                IQ_plot.append(self.IQ[num,:])
-                err_plot.append(self.err[num,:])
+               # Q_plot.append(self.Q)
+                IQ_plot.append(self.IQ[:,num])
+                err_plot.append(self.err[:,num])
                 legends_plot.append(self.legends[num])
                 curve_color.append(colors[num])
         # define the data
-        self.Q_plot = np.array(Q_plot).T
+        #self.Q_plot = selnp.array(Q_plot).T
         self.IQ_plot = np.array(IQ_plot).T
         self.err_plot = np.array(err_plot).T
         self.legends_plot = legends_plot

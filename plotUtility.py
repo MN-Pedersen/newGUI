@@ -10,6 +10,8 @@ Martin N. Pedersen
 """
 
 import matplotlib.cm as cm
+import h5py
+import numpy as np
 
 #%%
 
@@ -21,9 +23,8 @@ def prepare_merged_data(h5file, colorblind=False):
         IQ = f['Global/Data_set/IQ_curves'][:,1:]
         errors = f['Global/Data_set/Errorbars'][:,1:]
         
-        for num, delay in f['Global/Averaged']:
-            delay = delay.split(sep='_')[-1]
-            file_names.append(delay)
+        for num, delay in enumerate(f['Global/Averaged']):
+            file_names.append(delay.split(sep='_')[-1])
             outliers = f['Global/Averaged/'+delay+'/Outliers']
             inliers = f['Global/Averaged/'+delay+'/Selected_curves']
             
@@ -35,11 +36,12 @@ def prepare_merged_data(h5file, colorblind=False):
                 
             total_number = num_outliers+num_inliers
             
-            legend = '{delay} ({inliers}/{total})'.format(delay=delay, inliers=num_inliers, total=total_number)
+            legend = '{delay} ({inliers}/{total})'.format(delay=delay.split(sep='_')[-1], 
+                                                        inliers=num_inliers, total=total_number)
             legends.append(legend)
             
     variables = [Q, IQ, errors, file_names, legends]
-    names = ['Q', 'IQ', 'error', 'file_names', 'legends']
+    names = ['Q', 'IQ', 'errors', 'file_names', 'legends']
     plot_data= {}
         
     for num, name in enumerate(names):
@@ -60,10 +62,8 @@ def prepare_individual_data(h5file, data_sets, colorblind=False):
             Q = f[name+'/Data_set/IQ_curves'][:,0]
             IQ = f[name+'/Data_set/IQ_curves'][:,1:]
             errors = f[name+'Global/Data_set/Errorbars'][:,1:]
-            
-            for num, delay in f['Global/Averaged']:
-                delay = delay.split(sep='_')[-1]
-                file_names.append(delay)
+            for num, delay in enumerate(f['Global/Averaged']):
+                file_names.append(delay.split(sep='_')[-1])
                 outliers = f['Global/Averaged/'+delay+'/Outliers']
                 inliers = f['Global/Averaged/'+delay+'/Selected_curves']
             
@@ -75,7 +75,7 @@ def prepare_individual_data(h5file, data_sets, colorblind=False):
                 
                 total_number = num_outliers+num_inliers
                 
-                legend = '{delay} ({inliers}/{total})'.format(delay=delay, inliers=num_inliers, total=total_number)
+                legend = '{delay} ({inliers}/{total})'.format(delay=delay.split(sep='_')[-1], inliers=num_inliers, total=total_number)
                 legends.append(legend)
             
             variables = [Q, IQ, errors, file_names, legends]

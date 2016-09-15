@@ -26,8 +26,8 @@ from plotUtility import prepare_merged_data
 from plot1 import PlotWindow
 #%% 
     
-#ui_file = 'C:\\Users\\mpederse\\Documents\\Python_scripts\\new_waxsGUI\\main_window.ui'
-ui_file = 'C:\\Users\\kurt\\Documents\\GitHub\\newGUI\\main_window.ui'    
+ui_file = 'C:\\Users\\mpederse\\Documents\\Python_scripts\\new_waxsGUI\\main_window.ui'
+#ui_file = 'C:\\Users\\kurt\\Documents\\GitHub\\newGUI\\main_window.ui'    
 Ui_PlotWindow, QPlotWindow = loadUiType(ui_file )
 separator = '\\'   
 
@@ -59,7 +59,7 @@ class Main(QPlotWindow, Ui_PlotWindow):
         self.connect(self.gogogo, SIGNAL("clicked()"), self.Data_reduction)
         
         # standard plot
-        self.connect(self.gogogo, SIGNAL("clicked()"), self.produce_standard_plot)
+        self.connect(self.plot_standard, SIGNAL("clicked()"), self.produce_standard_plot)
         
         
         # set default values / behavior
@@ -100,34 +100,38 @@ class Main(QPlotWindow, Ui_PlotWindow):
         
         
     def Data_reduction(self):
-        list_folders = self.data_folders.replace(' ','').split(sep=',')
-        run_names = [directory.split(sep=separator)[-1] for directory in list_folders]        
+        #list_folders = [string.replace(' ','').split(sep=',') for string in self.data_folders]
+        run_names = [directory.split(sep=separator)[-1] for directory in self.data_folders]        
         list_logfiles = self.log_files.replace(' ','').split(sep=',')
        
         
-        if len(list_folders) > len(list_logfiles):
+        if len(run_names) > len(list_logfiles):
             if len(list_logfiles) == 1:
-                list_logfiles = np.tile(list_logfiles, len(list_folders))
+                list_logfiles = np.tile(list_logfiles, len(run_names))
             else:
                 raise ValueError('Please insure that logfiles are specified correctly\nEither one for all folders or one for each folder')
             
-        for num, directory in enumerate(list_folders):
-            average_and_write(directory, list_logfiles[num], run_names[num], self.h5file, Reduction_parameters)
+        for num, directory in enumerate(self.data_folders):
+            average_and_write(directory, list_logfiles[num], run_names[num], self.h5file, self.Reduction_parameters)
         
-        reduce_data(h5file, Reduction_parameters)
+        reduce_data(self.h5file, self.Reduction_parameters)
         
         
         
     def produce_standard_plot(self):
 
         
-        if individual_datasets.checkState():
-            data_sets = str(self.inp_individual_datasets.text).replace(' ','')
-            data_sets = data_sets.split(sep=',')
+        #if individual_datasets.checkState():
+        #    data_sets = str(self.inp_individual_datasets.text).replace(' ','')
+        #    data_sets = data_sets.split(sep=',')
             
-        if merged_plots.checkState():
+        if self.merged_plots_selected.checkState():
             plot_data = prepare_merged_data(self.h5file)
-            PlotWindow(plot_data)
+            self.plot = PlotWindow(plot_data) # new plot window set up to reviece at dictionary with entry 'path'
+            self.plot.Data_reader(plot_data)
+            self.plot.Add_plot()
+            #self.plot.PlotListUpdate()
+            self.plot.show()
         
     def ActionMaskSelect(self):
         folder = str(QtGui.QFileDialog.getOpenFileName())
