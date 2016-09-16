@@ -22,7 +22,7 @@ from waxsRead import *
 from poolUtility import *
 from expUtility import *
 from OTUtility import *
-from plotUtility import prepare_merged_data
+from plotUtility import prepare_merged_data, prepare_individual_data, prepare_comp_data
 from plot1 import PlotWindow
 #%% 
     
@@ -60,6 +60,9 @@ class Main(QPlotWindow, Ui_PlotWindow):
         
         # standard plot
         self.connect(self.plot_standard, SIGNAL("clicked()"), self.produce_standard_plot)
+        
+        # SVD analysis
+        self.connect(self.plot_SVD_comp, SIGNAL("clicked()"), self.produce_SVD_comps)
         
         
         # set default values / behavior
@@ -116,14 +119,11 @@ class Main(QPlotWindow, Ui_PlotWindow):
         
         reduce_data(self.h5file, self.Reduction_parameters)
         
-        
-        
     def produce_standard_plot(self):
-
-        
-        #if individual_datasets.checkState():
-        #    data_sets = str(self.inp_individual_datasets.text).replace(' ','')
-        #    data_sets = data_sets.split(sep=',')
+        if self.individual_datasets.checkState():
+            data_sets = str(self.inp_individual_datasets.text).replace(' ','')
+            data_sets = data_sets.split(sep=',')
+            individual_plot_data = prepare_individual_data(self.h5file, data_sets)
             
         if self.merged_plots_selected.checkState():
             plot_data = prepare_merged_data(self.h5file)
@@ -132,6 +132,10 @@ class Main(QPlotWindow, Ui_PlotWindow):
             self.plot.Add_plot()
             #self.plot.PlotListUpdate()
             self.plot.show()
+            
+            
+    def produce_SVD_comps(self):
+        comp_data = prepare_comp_data(self.h5file)
         
     def ActionMaskSelect(self):
         folder = str(QtGui.QFileDialog.getOpenFileName())

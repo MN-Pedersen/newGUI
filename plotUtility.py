@@ -58,17 +58,19 @@ def prepare_individual_data(h5file, data_sets, colorblind=False):
     with h5py.File(h5file) as f:
         legends = []
         file_names = []
+        IQ = []
+        errors = []
         for name in data_sets:
-            Q = f[name+'/Data_set/IQ_curves'][:,0]
-            IQ = f[name+'/Data_set/IQ_curves'][:,1:]
             errors = f[name+'Global/Data_set/Errorbars'][:,1:]
             for num, delay in enumerate(f['Global/Averaged']):
                 file_names.append(delay.split(sep='_')[-1])
                 outliers = f['Global/Averaged/'+delay+'/Outliers']
                 inliers = f['Global/Averaged/'+delay+'/Selected_curves']
-            
-                num_outliers = np.shape(outliers)[1]-1 # -1 for Q
-                num_inliers = np.shape(inliers)[1]-1 # -1 for Q
+                Q = f['Global/Averaged/'+delay+'/Mean'][:,0]
+                IQ.append(f['Global/Averaged/'+delay+'/Mean'][:,1])
+                errors.append(f['Global/Averaged/'+delay+'/Errors'][:,1])
+                num_outliers = np.shape(outliers)[1]-1 # -1 to account for Q-vector
+                num_inliers = np.shape(inliers)[1]-1 # -1 to account for Q-vector
             
                 if num_outliers == 1 and np.allclose(outliers[0,1], 0): # not a strong comparison
                     num_outliers = 0
@@ -78,7 +80,7 @@ def prepare_individual_data(h5file, data_sets, colorblind=False):
                 legend = '{delay} ({inliers}/{total})'.format(delay=delay.split(sep='_')[-1], inliers=num_inliers, total=total_number)
                 legends.append(legend)
             
-            variables = [Q, IQ, errors, file_names, legends]
+            variables = [Q, np.array(IQ), np.array(errors), file_names, legends]
             names = ['Q', 'IQ', 'error', 'file_names', 'legends']
             plot_data= {}
             
@@ -88,4 +90,16 @@ def prepare_individual_data(h5file, data_sets, colorblind=False):
             individual_plot_data[name] = plot_data
             
     return individual_plot_data
+
+
+#%%
+
+def prepare_comp_data(h5file, colorblind=False):
+    with h5py.File(h5file) as f:
+        Q = f['Global/Data_set/IQ_curves'][:,0]
+        IQ = f['Global/Data_set/IQ_curves'][:,1:]
+        time_seconds =  f['Global/Merged/Time_seconds'][:]
         
+        U, s, V = np.linalg.svd(IQ)
+        
+        return U, s, V, Q, time_seconds

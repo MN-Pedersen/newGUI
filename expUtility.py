@@ -48,6 +48,7 @@ def FunGetCorrections(two_theta, sample_thickness, sample_mu):
 
     cos = np.cos(np.deg2rad(tth)) # cos value
 
+    sample_coeff = sample_thickness/1000/10*sample_mu # coef sample, given in um and 1/cm resp.
     T = 1/csa*cos/(1-cos)*(np.exp(-csa)-np.exp(-csa/cos))
     T0 = np.exp(-csa)
     SampleCor = T0/T
