@@ -26,7 +26,7 @@ from plotUtility import prepare_merged_data, prepare_individual_data, prepare_co
 from plot1 import PlotWindow
 #%% 
     
-ui_file = 'C:\\Users\\mpederse\\Documents\\Python_scripts\\new_waxsGUI\\main_window.ui'
+ui_file = 'C:\\Users\\mpederse\\Documents\\GitHub\\newGUI\\main_window.ui'
 #ui_file = 'C:\\Users\\kurt\\Documents\\GitHub\\newGUI\\main_window.ui'    
 Ui_PlotWindow, QPlotWindow = loadUiType(ui_file )
 separator = '\\'   
