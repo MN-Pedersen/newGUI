@@ -27,7 +27,11 @@ from plot1 import PlotWindow
 from plot3 import CompWindow
 #%% 
     
+<<<<<<< HEAD
 ui_file = 'main_window.ui'
+=======
+ui_file = 'C:\\Users\\mpederse\\Documents\\GitHub\\newGUI\\main_window.ui'
+>>>>>>> origin/master
 #ui_file = 'C:\\Users\\kurt\\Documents\\GitHub\\newGUI\\main_window.ui'    
 Ui_PlotWindow, QPlotWindow = loadUiType(ui_file )
 separator = '\\'   
