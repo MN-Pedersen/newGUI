@@ -24,9 +24,10 @@ from expUtility import *
 from OTUtility import *
 from plotUtility import prepare_merged_data, prepare_individual_data, prepare_comp_data
 from plot1 import PlotWindow
+from plot3 import CompWindow
 #%% 
     
-ui_file = 'C:\\Users\\mpederse\\Documents\\Python_scripts\\new_waxsGUI\\main_window.ui'
+ui_file = 'main_window.ui'
 #ui_file = 'C:\\Users\\kurt\\Documents\\GitHub\\newGUI\\main_window.ui'    
 Ui_PlotWindow, QPlotWindow = loadUiType(ui_file )
 separator = '\\'   
@@ -69,8 +70,8 @@ class Main(QPlotWindow, Ui_PlotWindow):
         #self.Raw_SVD_cap.setText(str(20))
         #self.lowRankCap.setText(str(4))
         #self.Destination_folder.setText('C:\\Users\\mpederse\\Documents\\Python_scripts\\Gui_general')
-        self.inp_data_folders.setText('C:\\newWaxs_data\\run38, C:\\newWaxs_data\\run42') #, C:\\newWaxs_data\\run38, C:\\newWaxs_data\\run42')C:\\newWaxs_data\\run36
-        #self.inp_data_folders.setText('C:\\data\\run38, C:\\data\\run42')       
+        #self.inp_data_folders.setText('C:\\newWaxs_data\\run38, C:\\newWaxs_data\\run42') #, C:\\newWaxs_data\\run38, C:\\newWaxs_data\\run42')C:\\newWaxs_data\\run36
+        self.inp_data_folders.setText('C:\\data\\run38, C:\\data\\run42')       
         self.inp_sample_name.setText('test3')
         self.inp_logfiles.setText('Ru3CO12.log')
         self.inp_detector_dist.setText('0.035')
@@ -130,12 +131,13 @@ class Main(QPlotWindow, Ui_PlotWindow):
             self.plot = PlotWindow(plot_data) # new plot window set up to reviece at dictionary with entry 'path'
             self.plot.Data_reader(plot_data)
             self.plot.Add_plot()
-            #self.plot.PlotListUpdate()
             self.plot.show()
             
             
     def produce_SVD_comps(self):
-        comp_data = prepare_comp_data(self.h5file)
+        self.plot = CompWindow(self.h5file) # new plot window set up to reviece at dictionary with entry 'path'
+        self.plot.PlotListUpdate()
+        self.plot.show()
         
     def ActionMaskSelect(self):
         folder = str(QtGui.QFileDialog.getOpenFileName())
