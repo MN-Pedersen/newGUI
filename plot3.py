@@ -85,7 +85,7 @@ class CompWindow(QPlotWindow, Ui_PlotWindow):
                  plt.plot(self.Q, self.U_plot[:,num]*self.Q**2-num*2, color=self.plot_colours[num], label=self.legends[num],lw=2)
             
         plotbox = self.axes.get_position()
-        self.axes.set_position([plotbox.x0, plotbox.y0, plotbox.width * 0.85, plotbox.height])
+        self.axes.set_position([plotbox.x0, plotbox.y0, plotbox.width * 0.97, plotbox.height])
         self.axes.legend(loc='upper left', bbox_to_anchor=(1, 1.01))
 
             

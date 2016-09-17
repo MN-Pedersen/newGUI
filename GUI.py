@@ -12,7 +12,8 @@ from PyQt4.QtCore import SIGNAL
 
 # numerical libraries
 import numpy as np
-
+import seaborn as sns
+sns.set(font_scale=1.4,rc={'image.cmap': 'rainbow'})
 # HDF5 libraries
 #import h5py
 
@@ -22,17 +23,12 @@ from waxsRead import *
 from poolUtility import *
 from expUtility import *
 from OTUtility import *
-from plotUtility import prepare_merged_data, prepare_individual_data, prepare_comp_data
+from plotUtility import prepare_merged_data, prepare_individual_data, svd_differentials, cov_differentials, corr_differentials
 from plot1 import PlotWindow
 from plot3 import CompWindow
 #%% 
     
-<<<<<<< HEAD
-ui_file = 'main_window.ui'
-=======
-ui_file = 'C:\\Users\\mpederse\\Documents\\GitHub\\newGUI\\main_window.ui'
->>>>>>> origin/master
-#ui_file = 'C:\\Users\\kurt\\Documents\\GitHub\\newGUI\\main_window.ui'    
+ui_file = 'main_window.ui'  
 Ui_PlotWindow, QPlotWindow = loadUiType(ui_file )
 separator = '\\'   
 
@@ -69,6 +65,10 @@ class Main(QPlotWindow, Ui_PlotWindow):
         # SVD analysis
         self.connect(self.plot_SVD_comp, SIGNAL("clicked()"), self.produce_SVD_comps)
         
+        # Tranding analysis
+        self.connect(self.plot_SVD_diffs, SIGNAL("clicked()"), self.produce_SVD_diffs)
+        self.connect(self.plot_Cov, SIGNAL("clicked()"), self.produce_cov)
+        self.connect(self.plot_Corr, SIGNAL("clicked()"), self.produce_corr)
         
         # set default values / behavior
         #self.Raw_SVD_cap.setText(str(20))
@@ -88,6 +88,7 @@ class Main(QPlotWindow, Ui_PlotWindow):
         self.inp_Qmax.setText('8')
         self.inp_reference_flag.setText('-3ns')
         self.inp_num_outl.setText('10')
+        self.inp_delays_diffs.setText('-3ns')
         #self.inp_scan_width.setText('5')
         #self.inputList.setText('100ps, 1us')
         #self.refDelay.setText('-3ns')
@@ -143,6 +144,15 @@ class Main(QPlotWindow, Ui_PlotWindow):
         self.plot.PlotListUpdate()
         self.plot.show()
         
+    def produce_SVD_diffs(self):
+        svd_differentials(self.h5file, self.trending_diffs_delay)
+        
+    def produce_cov(self):
+        cov_differentials(self.h5file, self.trending_diffs_delay)
+    
+    def produce_corr(self):
+        corr_differentials(self.h5file, self.trending_diffs_delay)
+        
     def ActionMaskSelect(self):
         folder = str(QtGui.QFileDialog.getOpenFileName())
         self.inp_detector_mask.setText(folder)
@@ -171,6 +181,7 @@ class Main(QPlotWindow, Ui_PlotWindow):
         self.data_folders = str(self.inp_data_folders.text()).replace(' ','').split(sep=',')
         self.log_files = str(self.inp_logfiles.text())
         self.hdf5_append = str(self.inp_append_hdf5.text())
+        self.trending_diffs_delay = str(self.inp_delays_diffs.text())
         #self.numb_outliers = str(self.inp_num_outl.text())
         #self.scan_width = str(self.inp_scan_width.text())
         
