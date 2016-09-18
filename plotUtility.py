@@ -12,6 +12,7 @@ Martin N. Pedersen
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 from matplotlib import gridspec
+from random import randint
 import h5py
 import numpy as np
 import seaborn as sns
@@ -100,107 +101,144 @@ def prepare_individual_data(h5file, data_sets, colorblind=False):
 
 def svd_differentials(h5file, delay, colorblind=False):
     num_comps = 4
-    with h5py.File(h5file) as f:
-        for entry in f['Global/Merged/']:
-            if entry.split(sep='_')[-1] == delay:
-                Q = f['Global/Merged/'+entry][:,0]
-                IQ = f['Global/Merged/'+entry][:,1:]
+    Q, IQ = extract_data(h5file, delay) 
                 
-        U, s, V = np.linalg.svd(IQ)
+    U, s, V = np.linalg.svd(IQ)
         
         
-        figure = plt.figure(figsize=(14,10))
-        gs = gridspec.GridSpec(2,2)
+    figure = plt.figure(figsize=(14,10))
+    gs = gridspec.GridSpec(2,2)
         
-        axes = plt.subplot(gs[0,:])
-        plt.title('SVD analysis of raw Differentials\nDelay = {delay}'.format(delay=delay))
-        plt.xlabel('Q (1/A)')
-        plt.ylabel('Component variance multiplied by Q')
-        for num in range(num_comps):
-            plt.plot(Q, np.tile(-num, len(Q)), '-k')
-            plt.plot(Q, U[:,num]*Q-num, label='Comp. {num}'.format(num=num+1))
-        plt.legend(loc='best')
-        plt.ylim(-4,1)
-        plt.xlim(0, max(Q)+2)
-        plotbox =axes.get_position()
-        axes.set_position([plotbox.x0, plotbox.y0, plotbox.width, plotbox.height*0.90])
+    axes = plt.subplot(gs[0,:])
+    plt.title('SVD analysis of raw Differentials\nDelay = {delay}'.format(delay=delay))
+    plt.xlabel('Q (1/A)')
+    plt.ylabel('Component variance multiplied by Q')
+    for num in range(num_comps):
+        plt.plot(Q, np.tile(-num, len(Q)), '-k')
+        plt.plot(Q, U[:,num]*Q-num, label='Comp. {num}'.format(num=num+1))
+    plt.legend(loc='best')
+    plt.ylim(-4,1)
+    plt.xlim(0, max(Q)+2)
+    plotbox =axes.get_position()
+    axes.set_position([plotbox.x0, plotbox.y0, plotbox.width, plotbox.height*0.90])
             
-        plt.subplot(gs[1,0])
-        plt.xlabel('Frame')
-        plt.ylabel('Scaled component weigth')
-        for num in range(num_comps):
-            plt.plot(np.tile(-num, len(V)), '-k')
-            plt.plot(V[:,num]-num)
+    plt.subplot(gs[1,0])
+    plt.xlabel('Frame')
+    plt.ylabel('Scaled component weigth')
+    for num in range(num_comps):
+        plt.plot(np.tile(-num, len(V)), '-k')
+        plt.plot(V[:,num]-num)
         
-        plt.subplot(gs[1,1])
-        plt.xlabel('Component')
-        plt.ylabel('Singular Value Decomposition')
-        plt.loglog(s[:-3], 'o')
+    plt.subplot(gs[1,1])
+    plt.xlabel('Component')
+    plt.ylabel('Singular Value Decomposition')
+    plt.loglog(s[:-3], 'o')
         
-        plt.show()
+    plt.show()
         
         
 #%%
 
 def cov_differentials(h5file, delay, colorblind=False):
-    with h5py.File(h5file) as f:
-        for entry in f['Global/Merged/']:
-            if entry.split(sep='_')[-1] == delay:
-                Q = f['Global/Merged/'+entry][:,0]
-                IQ = f['Global/Merged/'+entry][:,1:]
+    Q, IQ = extract_data(h5file, delay) 
+
+    fig = plt.figure(figsize=(14,10))
     
-
-    plt.figure(figsize=(14,10))
-
-    plt.subplot(121)            
     covariance = np.cov(IQ)
     cov_transformed = np.log10(np.abs(covariance))
      
     plt.imshow(cov_transformed, interpolation='none', extent=[min(Q),max(Q),max(Q),min(Q)])
     plt.colorbar(fraction=0.046, pad=0.04)
+    plt.title('log10 of absolute covariance of Differentials\nDelay = {delay}'.format(delay=delay))
     plt.xlabel('Q (1/A)')
-    plt.ylabel('Q (1/A)')
-    
-    
-    plt.subplot(122)
-    covariance = np.cov(IQ.T)
-    cov_transformed = np.log10(np.abs(covariance))
-    plt.imshow(cov_transformed, interpolation='none')
-    plt.colorbar(fraction=0.046, pad=0.04)
-    plt.xlabel('Frame')
-    plt.ylabel('Frame')
-        
+    plt.ylabel('Q (1/A)')   
     plt.show()    
 
 #%%                
 
 def corr_differentials(h5file, delay, colorblind=False):
+    Q, IQ = extract_data(h5file, delay) 
+                
+    
+    fig = plt.figure(figsize=(14,10))
+
+    correlation = np.corrcoef(IQ)
+     
+    plt.imshow(correlation, interpolation='none', extent=[min(Q),max(Q),max(Q),min(Q)])
+    plt.colorbar(fraction=0.046, pad=0.04)
+    plt.title('Correlations of raw Differentials\nDelay = {delay}'.format(delay=delay))
+    plt.xlabel('Q (1/A)')
+    plt.ylabel('Q (1/A)')
+    plt.show()   
+    
+    
+#%%
+    
+    
+def hold_out_test(h5file, delay, colorblind=False):
+    Q, IQ = extract_data(h5file, delay)
+    num_curves = np.shape(IQ)[1]
+    num_repetitions = int(5)
+    mean_IQ = np.mean(IQ, axis=1)
+    print(np.shape(IQ))
+    
+    chis_test = np.zeros((num_repetitions,1))
+    chis_mean = []
+    chis_std = []
+    
+    start = int(0.1*num_curves)
+    stop = int(0.95*num_curves)
+    sample_sizes = list(np.linspace(start, stop, stop-start+1, dtype='int'))
+    for num in sample_sizes:
+        #print('Sample size')
+        #print(num)
+        indices = [randint(0,num_curves-1) for pick in range(num_repetitions*num)]
+        indices = np.array(indices).reshape(-1,num_repetitions)
+
+        for pick in range(num_repetitions):
+            #print(np.shape(IQ[:,indices[pick]]))
+            #index_TF = np.linspace(0,num_curves-1) == indices[:,pick]
+            sample = IQ[:,indices[:,pick]]
+            sample_mean = np.mean(sample, axis=1)
+            sample_std = np.std(sample, axis=1)
+            chis_test[pick] = np.sum((mean_IQ-sample_mean)**2/sample_std**2)/(num-1)
+            #print('Chis_test')
+            #print(chis_test)
+        
+        chis_mean.append(np.mean(chis_test))
+        chis_std.append(np.std(chis_test))
+        
+        if np.mod(num,start) == 0:
+            print('Finished with sample size: {sample_size}\n{size_left} tests left'.format(sample_size=num, size_left=stop-num))
+
+
+    chis_mean = np.array(chis_mean)
+    chis_std = np.array(chis_std)
+    fig = plt.figure()
+    plt.title('Signal / Noise holdout test')
+    plt.ylabel('Chi-test score')
+    plt.xlabel('Sample test size')
+    plt.plot(sample_sizes, chis_mean, label='Mean Chi-score (n={num_reps})'.format(num_reps=num_repetitions))
+    plt.fill_between(sample_sizes, chis_mean+chis_std, chis_mean-chis_std, alpha=0.6)
+    plt.legend(loc='best')
+    plt.show()
+    
+    
+
+
+
+
+
+
+#%%
+
+
+def extract_data(h5file, delay):
     with h5py.File(h5file) as f:
         for entry in f['Global/Merged/']:
             if entry.split(sep='_')[-1] == delay:
                 Q = f['Global/Merged/'+entry][:,0]
                 IQ = f['Global/Merged/'+entry][:,1:]
-                
     
-    plt.figure(figsize=(14,10))
-
-    plt.subplot(121)            
-    correlation = np.corrcoef(IQ)
-     
-    plt.imshow(correlation, interpolation='none', extent=[min(Q),max(Q),max(Q),min(Q)])
-    plt.colorbar(fraction=0.046, pad=0.04)
-    plt.xlabel('Q (1/A)')
-    plt.ylabel('Q (1/A)')
-    
-    
-    plt.subplot(122)
-    correlation = np.corrcoef(IQ.T)
-    plt.imshow(correlation, interpolation='none')
-    plt.colorbar(fraction=0.046, pad=0.04)
-    plt.xlabel('Frame')
-    plt.ylabel('Frame')
-        
-    plt.show()    
-    
-    
- 
+    return Q, IQ
+                 

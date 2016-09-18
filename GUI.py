@@ -23,7 +23,7 @@ from waxsRead import *
 from poolUtility import *
 from expUtility import *
 from OTUtility import *
-from plotUtility import prepare_merged_data, prepare_individual_data, svd_differentials, cov_differentials, corr_differentials
+from plotUtility import * 
 from plot1 import PlotWindow
 from plot3 import CompWindow
 #%% 
@@ -65,6 +65,9 @@ class Main(QPlotWindow, Ui_PlotWindow):
         # SVD analysis
         self.connect(self.plot_SVD_comp, SIGNAL("clicked()"), self.produce_SVD_comps)
         
+        # Signal / Noise
+        self.connect(self.plot_holdanal, SIGNAL("clicked()"), self.produce_holdout)
+        
         # Tranding analysis
         self.connect(self.plot_SVD_diffs, SIGNAL("clicked()"), self.produce_SVD_diffs)
         self.connect(self.plot_Cov, SIGNAL("clicked()"), self.produce_cov)
@@ -89,6 +92,7 @@ class Main(QPlotWindow, Ui_PlotWindow):
         self.inp_reference_flag.setText('-3ns')
         self.inp_num_outl.setText('10')
         self.inp_delays_diffs.setText('-3ns')
+        self.inp_delays_SN.setText('-3ns')
         #self.inp_scan_width.setText('5')
         #self.inputList.setText('100ps, 1us')
         #self.refDelay.setText('-3ns')
@@ -126,10 +130,10 @@ class Main(QPlotWindow, Ui_PlotWindow):
         reduce_data(self.h5file, self.Reduction_parameters)
         
     def produce_standard_plot(self):
-        if self.individual_datasets.checkState():
-            data_sets = str(self.inp_individual_datasets.text).replace(' ','')
-            data_sets = data_sets.split(sep=',')
-            individual_plot_data = prepare_individual_data(self.h5file, data_sets)
+        #if self.individual_datasets.checkState():
+        #    data_sets = str(self.inp_individual_datasets.text).replace(' ','')
+        #    data_sets = data_sets.split(sep=',')
+        #    individual_plot_data = prepare_individual_data(self.h5file, data_sets)
             
         if self.merged_plots_selected.checkState():
             plot_data = prepare_merged_data(self.h5file)
@@ -145,13 +149,20 @@ class Main(QPlotWindow, Ui_PlotWindow):
         self.plot.show()
         
     def produce_SVD_diffs(self):
+        self.trending_diffs_delay =  str(self.inp_delays_diffs.text())
         svd_differentials(self.h5file, self.trending_diffs_delay)
         
     def produce_cov(self):
+        self.trending_diffs_delay =  str(self.inp_delays_diffs.text())
         cov_differentials(self.h5file, self.trending_diffs_delay)
     
     def produce_corr(self):
+        self.trending_diffs_delay =  str(self.inp_delays_diffs.text())
         corr_differentials(self.h5file, self.trending_diffs_delay)
+        
+    def produce_holdout(self):
+        self.delay_SN = str(self.inp_delays_SN.text())
+        hold_out_test(self.h5file, self.delay_SN)
         
     def ActionMaskSelect(self):
         folder = str(QtGui.QFileDialog.getOpenFileName())
@@ -171,7 +182,7 @@ class Main(QPlotWindow, Ui_PlotWindow):
         reference_flag = str(self.inp_reference_flag.text())
         num_outliers = float(self.inp_num_outl.text())
         #scan_width = int(self.inp_scan_width.text())
-        num_points = 1200
+        num_points = 800
         
         # non-packed variables
         #self.laser_spot = str(self.inp_laser_spot.text())
@@ -181,7 +192,6 @@ class Main(QPlotWindow, Ui_PlotWindow):
         self.data_folders = str(self.inp_data_folders.text()).replace(' ','').split(sep=',')
         self.log_files = str(self.inp_logfiles.text())
         self.hdf5_append = str(self.inp_append_hdf5.text())
-        self.trending_diffs_delay = str(self.inp_delays_diffs.text())
         #self.numb_outliers = str(self.inp_num_outl.text())
         #self.scan_width = str(self.inp_scan_width.text())
         
