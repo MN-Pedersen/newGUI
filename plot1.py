@@ -167,7 +167,7 @@ class PlotWindow(QPlotWindow, Ui_PlotWindow):
         
     def Update(self):
         self.CurvesToPlot.clear() 
-        self.Load_data()
+        self.Data_reader(self.plot_data)
         self.Add_plot()
 
     def ZoomReset(self):
@@ -193,6 +193,7 @@ class PlotWindow(QPlotWindow, Ui_PlotWindow):
         self.err = plot_data['errors']
         self.file_names = plot_data['file_names']
         self.legends = plot_data['legends']
+        self.plot_data = plot_data
             
         for k, item in enumerate(self.file_names):
             self.CurvesToPlot.addItem(item)
