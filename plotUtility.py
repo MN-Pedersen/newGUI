@@ -142,7 +142,7 @@ def svd_differentials(h5file, delay, colorblind=False):
 def cov_differentials(h5file, delay, colorblind=False):
     Q, IQ = extract_data(h5file, delay) 
 
-    fig = plt.figure(figsize=(14,10))
+    fig = plt.figure(figsize=(10,10))
     
     covariance = np.cov(IQ)
     cov_transformed = np.log10(np.abs(covariance))
@@ -160,11 +160,11 @@ def corr_differentials(h5file, delay, colorblind=False):
     Q, IQ = extract_data(h5file, delay) 
                 
     
-    fig = plt.figure(figsize=(14,10))
+    fig = plt.figure(figsize=(12,10))
 
     correlation = np.corrcoef(IQ)
      
-    plt.imshow(correlation, interpolation='none', extent=[min(Q),max(Q),max(Q),min(Q)])
+    plt.imshow(correlation, interpolation='none', extent=[min(Q),max(Q),max(Q),min(Q)], vmin=-1, vmax=1) # difference from using plt.clim(-1,1)?
     plt.colorbar(fraction=0.046, pad=0.04)
     plt.title('Correlations of raw Differentials\nDelay = {delay}'.format(delay=delay))
     plt.xlabel('Q (1/A)')
@@ -225,6 +225,34 @@ def hold_out_test(h5file, delay, colorblind=False):
     
     
 
+#%%
+
+def Low_rank_approx(h5file):
+    num_comps = 4
+    with h5py.File(h5file) as f:
+        Q = f['Global/Data_set/IQ_curves'][:,0]
+        IQ = f['Global/Data_set/IQ_curves'][:,1:]
+    
+    U, s, V = np.linalg.svd(IQ)
+    residuals = []
+    for comps in range(num_comps):
+        S = np.zeros((len(U), len(V)))
+        S[:comps, :comps] = np.diag(s[:comps])
+        reconstruction = np.dot(U, np.dot(S, V))
+        residuals.append(IQ-reconstruction)
+        
+        fig = plt.figure()
+        plt.title('Low rank approximation Using {comps} components\nColour is % of maximum IQ'.format(comps=comps+1))
+        plt.imshow((IQ-reconstruction)/np.max(IQ)*100, aspect='auto', extent=[1, len(V), max(Q), min(Q)])
+        plt.colorbar()
+        plt.ylabel('Q (1/A)')
+        plt.xlabel('Data curve')
+        plt.show()
+        
+
+    
+        
+        
 
 
 

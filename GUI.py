@@ -64,6 +64,8 @@ class Main(QPlotWindow, Ui_PlotWindow):
         
         # SVD analysis
         self.connect(self.plot_SVD_comp, SIGNAL("clicked()"), self.produce_SVD_comps)
+        self.connect(self.plot_low_rank, SIGNAL("clicked()"), self.produce_lowRank)
+
         
         # Signal / Noise
         self.connect(self.plot_holdanal, SIGNAL("clicked()"), self.produce_holdout)
@@ -78,7 +80,8 @@ class Main(QPlotWindow, Ui_PlotWindow):
         #self.lowRankCap.setText(str(4))
         #self.Destination_folder.setText('C:\\Users\\mpederse\\Documents\\Python_scripts\\Gui_general')
         #self.inp_data_folders.setText('C:\\newWaxs_data\\run38, C:\\newWaxs_data\\run42') #, C:\\newWaxs_data\\run38, C:\\newWaxs_data\\run42')C:\\newWaxs_data\\run36
-        self.inp_data_folders.setText('C:\\data\\run38, C:\\data\\run42')       
+        self.inp_data_folders.setText('\\\\unixhome\\ID09\\inhouse\\Victoria\\June_2016_Ru3Co12\\run57, \\\\unixhome\\ID09\\inhouse\\Victoria\\June_2016_Ru3Co12\\run39, \\\\unixhome\\ID09\\inhouse\\Victoria\\June_2016_Ru3Co12\\run40') 
+        #self.inp_data_folders.setText('C:\\data\\run38, C:\\data\\run42')       
         self.inp_sample_name.setText('test3')
         self.inp_logfiles.setText('Ru3CO12.log')
         self.inp_detector_dist.setText('0.035')
@@ -100,12 +103,15 @@ class Main(QPlotWindow, Ui_PlotWindow):
         
         
         # preparing global variables
+        # old values! take out and check under each method!!!
+        # ************* !!!!!!!!!!!!!!!! ***************
         self.Reduction_parameters = self.get_all_parameters()
         if self.hdf5_append == '':
             destination_folder = self.data_folders[-1]
         else:
             destination_folder = self.hdf5_append
-        self.h5file = destination_folder + separator + self.sample_name        
+        self.h5file = destination_folder + separator + self.sample_name
+        print(self.h5file)        
         
         
         
@@ -113,6 +119,16 @@ class Main(QPlotWindow, Ui_PlotWindow):
         
         
     def Data_reduction(self):
+        self.Reduction_parameters = self.get_all_parameters()
+        if self.hdf5_append == '':
+            destination_folder = self.data_folders[-1]
+        else:
+            destination_folder = self.hdf5_append
+        self.h5file = destination_folder + separator + self.sample_name
+        print(self.h5file)        
+                
+        
+        
         #list_folders = [string.replace(' ','').split(sep=',') for string in self.data_folders]
         run_names = [directory.split(sep=separator)[-1] for directory in self.data_folders]        
         list_logfiles = self.log_files.replace(' ','').split(sep=',')
@@ -147,6 +163,9 @@ class Main(QPlotWindow, Ui_PlotWindow):
         self.plot = CompWindow(self.h5file) # new plot window set up to reviece at dictionary with entry 'path'
         self.plot.PlotListUpdate()
         self.plot.show()
+        
+    def produce_lowRank(self):
+        Low_rank_approx(self.h5file)
         
     def produce_SVD_diffs(self):
         self.trending_diffs_delay =  str(self.inp_delays_diffs.text())
@@ -192,6 +211,7 @@ class Main(QPlotWindow, Ui_PlotWindow):
         self.data_folders = str(self.inp_data_folders.text()).replace(' ','').split(sep=',')
         self.log_files = str(self.inp_logfiles.text())
         self.hdf5_append = str(self.inp_append_hdf5.text())
+        print(self.hdf5_append)
         #self.numb_outliers = str(self.inp_num_outl.text())
         #self.scan_width = str(self.inp_scan_width.text())
         
