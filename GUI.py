@@ -5,15 +5,18 @@ Created on Wed Mar 02 10:48:40 2016
 @author: mpederse
 """
 
+# python standard libraries
+import sys # large namespace
+
 # PyQT4
-from PyQt4.uic import loadUiType
-from PyQt4 import QtCore   
-from PyQt4.QtCore import SIGNAL
+from PyQt5.uic import loadUiType
+from PyQt5 import QtCore   
+from PyQt5.QtCore import pyqtSignal as SIGNAL
 
 # numerical libraries
 import numpy as np
-import seaborn as sns
-sns.set(font_scale=1.4,rc={'image.cmap': 'rainbow'})
+#import seaborn as sns
+#sns.set(font_scale=1.4,rc={'image.cmap': 'rainbow'})
 # HDF5 libraries
 #import h5py
 
@@ -29,8 +32,12 @@ from plot3 import CompWindow
 #%% 
     
 ui_file = 'main_window.ui'  
-Ui_PlotWindow, QPlotWindow = loadUiType(ui_file )
-separator = '\\'   
+Ui_PlotWindow, QPlotWindow = loadUiType(ui_file)
+
+if sys.platform.startswith('linux') or sys.platform == 'darwin':
+    separator = '/'
+else:
+    separator = '\\'
 
 # *** TO DOs ***
 #
@@ -50,40 +57,41 @@ class Main(QPlotWindow, Ui_PlotWindow):
         #self.connect(self.ButtonPathSelect_1, SIGNAL("clicked()"), self.ActionPathSelect1)
         
         # mask
-        self.connect(self.Select_mask, SIGNAL("clicked()"), self.ActionMaskSelect)
+        self.Select_mask.clicked.connect(self.ActionMaskSelect)
 
         
         # other path settings
         #self.connect(self.ButtonPathSolute, SIGNAL("clicked()"), self.solute_select)
 
         # write data
-        self.connect(self.gogogo, SIGNAL("clicked()"), self.Data_reduction)
+        self.gogogo.clicked.connect(self.Data_reduction)
         
         # standard plot
-        self.connect(self.plot_standard, SIGNAL("clicked()"), self.produce_standard_plot)
+        self.plot_standard.clicked.connect(self.produce_standard_plot)
         
         # SVD analysis
-        self.connect(self.plot_SVD_comp, SIGNAL("clicked()"), self.produce_SVD_comps)
-        self.connect(self.plot_low_rank, SIGNAL("clicked()"), self.produce_lowRank)
+        self.plot_SVD_comp.clicked.connect(self.produce_SVD_comps)
+        self.plot_low_rank.clicked.connect(self.produce_lowRank)
 
         
         # Signal / Noise
-        self.connect(self.plot_holdanal, SIGNAL("clicked()"), self.produce_holdout)
+        self.plot_holdanal.clicked.connect(self.produce_holdout)
         
         # Tranding analysis
-        self.connect(self.plot_SVD_diffs, SIGNAL("clicked()"), self.produce_SVD_diffs)
-        self.connect(self.plot_Cov, SIGNAL("clicked()"), self.produce_cov)
-        self.connect(self.plot_Corr, SIGNAL("clicked()"), self.produce_corr)
+        self.plot_SVD_diffs.clicked.connect(self.produce_SVD_diffs)
+        self.plot_Cov.clicked.connect(self.produce_cov)
+        self.plot_Corr.clicked.connect(self.produce_corr)
         
         # set default values / behavior
         #self.Raw_SVD_cap.setText(str(20))
         #self.lowRankCap.setText(str(4))
         #self.Destination_folder.setText('C:\\Users\\mpederse\\Documents\\Python_scripts\\Gui_general')
         #self.inp_data_folders.setText('C:\\newWaxs_data\\run38, C:\\newWaxs_data\\run42') #, C:\\newWaxs_data\\run38, C:\\newWaxs_data\\run42')C:\\newWaxs_data\\run36
-        self.inp_data_folders.setText('\\\\unixhome\\ID09\\inhouse\\Victoria\\June_2016_Ru3Co12\\run57, \\\\unixhome\\ID09\\inhouse\\Victoria\\June_2016_Ru3Co12\\run39, \\\\unixhome\\ID09\\inhouse\\Victoria\\June_2016_Ru3Co12\\run40') 
-        #self.inp_data_folders.setText('C:\\data\\run38, C:\\data\\run42')       
+        #self.inp_data_folders.setText('\\\\unixhome\\ID09\\inhouse\\Victoria\\June_2016_Ru3Co12\\run57, \\\\unixhome\\ID09\\inhouse\\Victoria\\June_2016_Ru3Co12\\run39, \\\\unixhome\\ID09\\inhouse\\Victoria\\June_2016_Ru3Co12\\run40') 
+        self.inp_data_folders.setText('/data/id09/inhouse/Victoria/June_2016_Ru3Co12/run39, /data/id09/inhouse/Victoria/June_2016_Ru3Co12/run40, /data/id09/inhouse/Victoria/June_2016_Ru3Co12/run57')       
+        #self.inp_data_folders.setText('/data/id09/inhouse/Victoria/June_2016_Ru3Co12/run74')
         self.inp_sample_name.setText('test3')
-        self.inp_logfiles.setText('Ru3CO12.log')
+        self.inp_logfiles.setText('dye2.log')
         self.inp_detector_dist.setText('0.035')
         self.inp_det_binning.setText('2x2')
         self.inp_energy.setText('18')
@@ -96,6 +104,7 @@ class Main(QPlotWindow, Ui_PlotWindow):
         self.inp_num_outl.setText('10')
         self.inp_delays_diffs.setText('-3ns')
         self.inp_delays_SN.setText('-3ns')
+        self.inp_detector_mask.setText('')
         #self.inp_scan_width.setText('5')
         #self.inputList.setText('100ps, 1us')
         #self.refDelay.setText('-3ns')
@@ -141,7 +150,7 @@ class Main(QPlotWindow, Ui_PlotWindow):
                 raise ValueError('Please insure that logfiles are specified correctly\nEither one for all folders or one for each folder')
             
         for num, directory in enumerate(self.data_folders):
-            average_and_write(directory, list_logfiles[num], run_names[num], self.h5file, self.Reduction_parameters)
+            average_and_write(directory, list_logfiles[num], run_names[num], self.h5file, self.Reduction_parameters, separator)
         
         reduce_data(self.h5file, self.Reduction_parameters)
         
@@ -200,6 +209,7 @@ class Main(QPlotWindow, Ui_PlotWindow):
         norm_Qmax = float(self.inp_Qmax.text())
         reference_flag = str(self.inp_reference_flag.text())
         num_outliers = float(self.inp_num_outl.text())
+        mask_path = self.inp_detector_mask.setText('')
         #scan_width = int(self.inp_scan_width.text())
         num_points = 800
         
@@ -217,10 +227,10 @@ class Main(QPlotWindow, Ui_PlotWindow):
         
         exp_variable_names = ['detector_dist', 'detector_bin', 'Xray_energy', 'Xray_position',
                               'sample_thickness', 'solvent_abs', 'norm_Qmin', 'norm_Qmax', 'reference_flag', 
-                              'num_outliers', 'num_points'] #'scan_width'
+                              'num_outliers', 'num_points', 'mask_path'] #'scan_width'
         exp_variables = [detector_dist, detector_bin, Xray_energy, Xray_position, sample_thickness,
                          solvent_abs, norm_Qmin, norm_Qmax, reference_flag, num_outliers,
-                         num_points] # scan_width
+                         num_points, mask_path] # scan_width
         Reduction_parameters = {}
         
         for num, name in enumerate(exp_variable_names):
@@ -242,13 +252,13 @@ class Main(QPlotWindow, Ui_PlotWindow):
 
 if __name__ == '__main__':
     import sys, os
-    from PyQt4 import QtGui
+    from PyQt5 import QtWidgets
 
     
     
     
     
-    app = QtGui.QApplication(sys.argv)
+    app = QtWidgets.QApplication(sys.argv)
     main = Main()
     main.show()
     

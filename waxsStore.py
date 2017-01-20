@@ -24,7 +24,7 @@ from expUtility import *
 
 #%%
 
-def read_log(storage_folder, logname):
+def read_log(storage_folder, logname, separator):
     """
     
     
@@ -37,14 +37,14 @@ def read_log(storage_folder, logname):
     SB_current = [] # single bunch current
     SR_current = [] # general storage ring current
     
-    path_to_logfile = storage_folder + '\\' + logname
+    path_to_logfile = storage_folder + separator + logname
     for line in open(path_to_logfile):
         if line[0] is not '#':
             line_split = line.split()
             
             
             # append information
-            edf_paths.append(storage_folder + '\\' + line_split[2] + '.edf')
+            edf_paths.append(storage_folder + separator + line_split[2] + '.edf')
             time_delays.append(line_split[3].replace(' - ','off'))
             SB_current.append(float(line_split[6]))
             SR_current.append(float(line_split[5]))
@@ -158,14 +158,14 @@ def log_sorter(edf_paths, time_delays, unique_time_delays):
     
 #%%    
     
-def average_and_write(data_path, logfile, run_name,  h5file, Reduction_parameters):
+def average_and_write(data_path, logfile, run_name,  h5file, Reduction_parameters, separator):
     """
 
 
     """
     print('entering average_and_write')
     
-    edf_paths, time_delays, SB_current, SR_current, unique_time_delays = read_log(data_path, logfile)
+    edf_paths, time_delays, SB_current, SR_current, unique_time_delays = read_log(data_path, logfile, separator)
     
     integration_paths, int_indices, sorted_time_delays, time_seconds =  log_sorter(edf_paths, time_delays, unique_time_delays)
     
@@ -196,6 +196,7 @@ def average_and_write(data_path, logfile, run_name,  h5file, Reduction_parameter
 
                 num_images = len(integration_paths[num])
                 data_1D = np.zeros((num_points, num_images+1))
+                mask = get_mask(Reduction_parameters)
                 for count, path in enumerate(integration_paths[num]):
                     #mask_data = 'none' # for now mask=mask_data,
                     image = fabio.open(path).data
@@ -203,14 +204,29 @@ def average_and_write(data_path, logfile, run_name,  h5file, Reduction_parameter
                     Q, IQ = integrator.integrate1d(image,npt=num_points,
                                                    correctSolidAngle=True,
                                                    polarization_factor=1,
-                                                   unit="q_A^-1") #method=v['IntMethod']
+                                                   unit='q_A^-1',
+                                                   method='lut')
+                    # subtract offset
+                    IQ -= 10
+                               
                     if count == 0:
+                        two_theta, __ = integrator.integrate1d(image,npt=num_points,
+                                                   correctSolidAngle=True,
+                                                   polarization_factor=1,
+                                                   unit='2th_deg',
+                                                   method='lut')
+                        
+                        corrections = FunGetCorrections(two_theta)
+                        IQ *= corrections
                         data_1D[:,:2]= np.array([Q, IQ]).T
                     else:
+                        IQ *= corrections 
                         data_1D[:,count+1] = IQ.T
                 
                 data_string = group_string + '/1D'
                 f[data_string] = data_1D
+                correction_string = group_string + '/1D_correction'
+                f[correction_string] = np.array([Q, corrections])
             # logging            
                 elapsed = str((timeit.default_timer() - start_time)/60)
                 print('finished with {delay} in {time}min'.format(delay=delay,time=elapsed[:4]))
