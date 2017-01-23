@@ -116,12 +116,13 @@ def svd_differentials(h5file, delay, colorblind=False):
     for num in range(num_comps):
         plt.plot(Q, np.tile(-num, len(Q)), '-k')
         plt.plot(Q, U[:,num]*Q-num, label='Comp. {num}'.format(num=num+1))
-    plt.legend(loc='best')
+    #plt.legend(loc='best')
     plt.ylim(-4,1)
     plt.xlim(0, max(Q)+2)
     plotbox =axes.get_position()
-    axes.set_position([plotbox.x0, plotbox.y0, plotbox.width, plotbox.height*0.90])
-            
+    axes.set_position([plotbox.x0, plotbox.y0, plotbox.width*0.85, plotbox.height*0.90])
+    axes.legend(loc='upper left', bbox_to_anchor=(1, 0.95))
+        
     plt.subplot(gs[1,0])
     plt.xlabel('Frame')
     plt.ylabel('Scaled component weigth')
@@ -169,6 +170,30 @@ def corr_differentials(h5file, delay, colorblind=False):
     plt.title('Correlations of raw Differentials\nDelay = {delay}'.format(delay=delay))
     plt.xlabel('Q (1/A)')
     plt.ylabel('Q (1/A)')
+    
+    
+    fig = plt.figure(figsize=(10,10))
+    num_idx = 10
+    num_points = 50
+    indices = np.linspace(num_points,len(Q)-num_points,num_idx, dtype=int)
+    colors = [cm.brg(k/float(num_idx),1) for k in range(num_idx)]
+    x_axis = np.linspace(-num_points/2,num_points/2,num_points)
+    for num, idx in enumerate(indices):
+        curve = correlation[idx,:]
+        start = int(idx-num_points/2)
+        stop = int(idx+num_points/2)
+        #x_axis = np.linspace(-num_points/2,num_points/2,stop-start)
+        plt.plot(x_axis-0.5, curve[start:stop], color=colors[num], label='Q = %0.1f (1/A)' % Q[idx])
+    plt.legend(loc='best')
+    plt.xlabel('Pixels away from center (pixel)')
+    plt.ylabel('Correlation')
+    plt.title('Point spread functions at different Qs')
+        
+        
+    
+    
+    
+    
     plt.show()   
     
     
@@ -268,5 +293,5 @@ def extract_data(h5file, delay):
                 Q = f['Global/Merged/'+entry][:,0]
                 IQ = f['Global/Merged/'+entry][:,1:]
     
-    return Q, IQ
+                return Q, IQ
                  

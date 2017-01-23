@@ -75,14 +75,17 @@ class CompWindow(QPlotWindow, Ui_PlotWindow):
         plt.ylabel(y_axis)
         plt.grid(b=True, which=u'major', axis=u'both')
         for num in range(len(self.legends)):
-            plt.plot(self.Q, np.tile(-num*2, len(self.Q)), '-k', lw=2)
+            
             
             if self.dsq_state == 1:
-                plt.plot(self.Q, self.U_plot[:,num]-num*2, color=self.plot_colours[num], label=self.legends[num],lw=2)
+                plt.plot(self.Q, np.tile(-num*0.5, len(self.Q)), '-k', lw=2)
+                plt.plot(self.Q, self.U_plot[:,num]-num*0.5, color=self.plot_colours[num], label=self.legends[num],lw=2)               
             elif self.dsq_state == 2:
-                plt.plot(self.Q, self.U_plot[:,num]*self.Q-num*2, color=self.plot_colours[num], label=self.legends[num],lw=2)
+                plt.plot(self.Q, np.tile(-num*0.5, len(self.Q)), '-k', lw=2)
+                plt.plot(self.Q, self.U_plot[:,num]*self.Q-num*0.5, color=self.plot_colours[num], label=self.legends[num],lw=2)
             elif self.dsq_state == 3:
-                 plt.plot(self.Q, self.U_plot[:,num]*self.Q**2-num*2, color=self.plot_colours[num], label=self.legends[num],lw=2)
+                plt.plot(self.Q, np.tile(-num*1, len(self.Q)), '-k', lw=2)
+                plt.plot(self.Q, self.U_plot[:,num]*self.Q**2-num*1, color=self.plot_colours[num], label=self.legends[num],lw=2)
             
         plotbox = self.axes.get_position()
         self.axes.set_position([plotbox.x0, plotbox.y0, plotbox.width * 0.97, plotbox.height])
@@ -97,8 +100,8 @@ class CompWindow(QPlotWindow, Ui_PlotWindow):
         plt.ylabel('Weigth')
         plt.grid(b=True, which=u'major', axis=u'both')
         for num in range(len(self.legends)):
-            plt.semilogx(self.time_seconds, np.tile(-num*2, len(self.time_seconds)), '-k', lw=2)
-            plt.semilogx(self.time_seconds, self.V_plot[:,num]-num*2, color=self.plot_colours[num], lw=2)
+            plt.semilogx(self.time_seconds, np.tile(-num, len(self.time_seconds)), '-k', lw=2)
+            plt.semilogx(self.time_seconds, self.V_plot[:,num]-num, color=self.plot_colours[num], lw=2)
         plotbox = self.axes.get_position()
         self.axes.set_position([plotbox.x0, plotbox.y0, plotbox.width*0.95, plotbox.height*0.95])
             
@@ -164,7 +167,7 @@ class CompWindow(QPlotWindow, Ui_PlotWindow):
 
         
         for num in range(self.num_comps):
-            item = 'Component {num}'.format(num=num)
+            item = 'Component {num}'.format(num=num+1)
             self.CompsToPlot.addItem(item)
             if num <= 4:
                 self.CompsToPlot.item(num).setCheckState(QtCore.Qt.Checked)

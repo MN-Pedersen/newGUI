@@ -5,6 +5,9 @@ Created on Wed Mar 02 10:48:40 2016
 @author: mpederse
 """
 
+# TO DO - inspect outliers, as funbtion of frame and run/folder.
+# calculate mask from binning/occurences. Flag outliers from over trend
+
 # PyQT4
 from PyQt4.uic import loadUiType
 from PyQt4 import QtCore   
@@ -79,15 +82,17 @@ class Main(QPlotWindow, Ui_PlotWindow):
         #self.Raw_SVD_cap.setText(str(20))
         #self.lowRankCap.setText(str(4))
         #self.Destination_folder.setText('C:\\Users\\mpederse\\Documents\\Python_scripts\\Gui_general')
-        #self.inp_data_folders.setText('C:\\newWaxs_data\\run38, C:\\newWaxs_data\\run42') #, C:\\newWaxs_data\\run38, C:\\newWaxs_data\\run42')C:\\newWaxs_data\\run36
-        self.inp_data_folders.setText('\\\\unixhome\\ID09\\inhouse\\Victoria\\June_2016_Ru3Co12\\run57, \\\\unixhome\\ID09\\inhouse\\Victoria\\June_2016_Ru3Co12\\run39, \\\\unixhome\\ID09\\inhouse\\Victoria\\June_2016_Ru3Co12\\run40') 
-        #self.inp_data_folders.setText('C:\\data\\run38, C:\\data\\run42')       
+        self.inp_data_folders.setText('C:\\newWaxs_data\\run36, C:\\newWaxs_data\\run38, C:\\newWaxs_data\\run42, C:\\newWaxs_data\\run43, C:\\newWaxs_data\\run44') #, C:\\newWaxs_data\\run38, C:\\newWaxs_data\\run42')C:\\newWaxs_data\\run36
+        #self.inp_data_folders.setText('\\\\unixhome\\ID09\\inhouse\\Victoria\\June_2016_Ru3Co12\\run57, \\\\unixhome\\ID09\\inhouse\\Victoria\\June_2016_Ru3Co12\\run39, \\\\unixhome\\ID09\\inhouse\\Victoria\\June_2016_Ru3Co12\\run40') 
+        #self.inp_data_folders.setText('C:\\newWaxs_data\\run38, C:\\newWaxs_data\\run42')       
+        #self.inp_data_folders.setText('C:\\newWaxs_data\\DCM1')        
         self.inp_sample_name.setText('test3')
         self.inp_logfiles.setText('Ru3CO12.log')
         self.inp_detector_dist.setText('0.035')
         self.inp_det_binning.setText('2x2')
         self.inp_energy.setText('18')
-        self.inp_beam_pos.setText('949.5, 923.5')
+        #self.inp_beam_pos.setText('636, 642')
+        self.inp_beam_pos.setText('954.5, 960')
         self.inp_sample_thick.setText('1')
         self.inp_solvent_abs.setText('1')
         self.inp_Qmin.setText('6')
