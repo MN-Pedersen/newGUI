@@ -11,15 +11,15 @@ Martin N. Pedersen
 
 #%%
 
-from PyQt4.uic import loadUiType
+from PyQt5.uic import loadUiType
 import os 
 from matplotlib.figure import Figure
-from matplotlib.backends.backend_qt4agg import (
-    FigureCanvasQTAgg as FigureCanvas,
+from matplotlib.backends.backend_qt5agg import (
     NavigationToolbar2QT as NavigationToolbar)
- 
-from PyQt4 import QtCore   
-from PyQt4.QtCore import SIGNAL    
+
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from PyQt5 import QtCore   
+from PyQt5.QtCore import pyqtSignal as SIGNAL    
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import numpy as np
@@ -38,7 +38,9 @@ class PlotWindow(QPlotWindow, Ui_PlotWindow):
         self.setupUi(self)
         # make a plot
         self.figure = plt.figure()
+        #self.setCentralWidget(self.figure)
         self.canvas = FigureCanvas(self.figure)
+        
         #self.axes = self.figure.add_subplot(111)
         self.plot_vl.addWidget(self.canvas)
         self.toolbar = NavigationToolbar(self.canvas,
@@ -46,13 +48,15 @@ class PlotWindow(QPlotWindow, Ui_PlotWindow):
         self.plot_vl.addWidget(self.toolbar)
         self.replot = False
 
-        self.connect(self.dsq,SIGNAL("clicked()"),self.Add_plot)
-        self.connect(self.qdsq,SIGNAL("clicked()"),self.Add_plot)
-        self.connect(self.qqdsq,SIGNAL("clicked()"),self.Add_plot)
-        self.connect(self.CurvesToPlot,SIGNAL("itemChanged (QListWidgetItem*)"), self.PlotListUpdate)
-        self.connect(self.ButtonUpdate,SIGNAL("clicked()"),self.Update)
-        self.connect(self.ResetZoom,SIGNAL("clicked()"),self.ZoomReset)
-        self.connect(self.Errorbars,SIGNAL("clicked()"), self.ChangeErrorbars)
+        
+        # connections
+        self.dsq.clicked.connect(self.Add_plot)
+        self.qdsq.clicked.connect(self.Add_plot)
+        self.qqdsq.clicked.connect(self.Add_plot)
+        self.CurvesToPlot.itemChanged.connect(self.PlotListUpdate)
+        self.ButtonUpdate.clicked.connect(self.Update)
+        self.ResetZoom.clicked.connect(self.ZoomReset)
+        self.Errorbars.clicked.connect(self.ChangeErrorbars)
 
         # *** Various settings used to configure the settings ***
         #self.my_path = info_dict['path']
@@ -63,6 +67,9 @@ class PlotWindow(QPlotWindow, Ui_PlotWindow):
         # because PlotListUpdate is passed before Add_plot due to the 
         # CurvesToPlot-PlotListUpdate connection above
         self.First_round_check = True
+        
+        
+        
         
         
     def Add_plot(self):

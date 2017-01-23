@@ -9,15 +9,15 @@ Martin N. Pedersen
 
 """
 
-from PyQt4.uic import loadUiType
+from PyQt5.uic import loadUiType
 import os 
 from matplotlib.figure import Figure
-from matplotlib.backends.backend_qt4agg import (
-    FigureCanvasQTAgg as FigureCanvas,
+from matplotlib.backends.backend_qt5agg import (
     NavigationToolbar2QT as NavigationToolbar)
- 
-from PyQt4 import QtCore   
-from PyQt4.QtCore import SIGNAL    
+
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas 
+from PyQt5 import QtCore   
+from PyQt5.QtCore import pyqtSignal as SIGNAL    
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 from matplotlib import gridspec
@@ -43,11 +43,11 @@ class CompWindow(QPlotWindow, Ui_PlotWindow):
         self.plot_vl.addWidget(self.toolbar)
         self.replot = False
 
-        self.connect(self.dsq,SIGNAL("clicked()"),self.Add_plot)
-        self.connect(self.qdsq,SIGNAL("clicked()"),self.Add_plot)
-        self.connect(self.qqdsq,SIGNAL("clicked()"),self.Add_plot)
-        self.connect(self.CompsToPlot,SIGNAL("itemChanged (QListWidgetItem*)"), self.PlotListUpdate)
-        self.connect(self.ResetZoom,SIGNAL("clicked()"),self.ZoomReset)
+        self.dsq.clicked.connect(self.Add_plot)
+        self.qdsq.clicked.connect(self.Add_plot)
+        self.qqdsq.clicked.connect(self.Add_plot)
+        self.CompsToPlot.itemChanged.connect(self.PlotListUpdate)
+        self.ResetZoom.clicked.connect(self.ZoomReset)
 
         # *** Various settings used to configure the settings ***
         self.Use_errorbars = False
@@ -169,7 +169,7 @@ class CompWindow(QPlotWindow, Ui_PlotWindow):
         for num in range(self.num_comps):
             item = 'Component {num}'.format(num=num+1)
             self.CompsToPlot.addItem(item)
-            if num <= 4:
+            if num <= 2:
                 self.CompsToPlot.item(num).setCheckState(QtCore.Qt.Checked)
             else:
                 self.CompsToPlot.item(num).setCheckState(QtCore.Qt.Unchecked)

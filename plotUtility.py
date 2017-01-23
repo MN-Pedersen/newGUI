@@ -16,7 +16,7 @@ from random import randint
 import h5py
 import numpy as np
 import seaborn as sns
-sns.set(font_scale=1.4,rc={'image.cmap': 'rainbow'})
+sns.set(font_scale=1.4,rc={'image.cmap': 'rainbow'}, style='whitegrid')
 
 #%%
 
@@ -105,8 +105,8 @@ def svd_differentials(h5file, delay, colorblind=False):
                 
     U, s, V = np.linalg.svd(IQ)
         
-        
-    figure = plt.figure(figsize=(14,10))
+    #plt.close()  
+    fig = plt.figure(figsize=(14,10))
     gs = gridspec.GridSpec(2,2)
         
     axes = plt.subplot(gs[0,:])
@@ -142,7 +142,7 @@ def svd_differentials(h5file, delay, colorblind=False):
 
 def cov_differentials(h5file, delay, colorblind=False):
     Q, IQ = extract_data(h5file, delay) 
-
+    #plt.close()
     fig = plt.figure(figsize=(10,10))
     
     covariance = np.cov(IQ)
@@ -160,7 +160,7 @@ def cov_differentials(h5file, delay, colorblind=False):
 def corr_differentials(h5file, delay, colorblind=False):
     Q, IQ = extract_data(h5file, delay) 
                 
-    
+    #plt.close()
     fig = plt.figure(figsize=(12,10))
 
     correlation = np.corrcoef(IQ)
@@ -239,6 +239,8 @@ def hold_out_test(h5file, delay, colorblind=False):
 
     chis_mean = np.array(chis_mean)
     chis_std = np.array(chis_std)
+    
+    #plt.close()
     fig = plt.figure()
     plt.title('Signal / Noise holdout test')
     plt.ylabel('Chi-test score')
@@ -266,6 +268,7 @@ def Low_rank_approx(h5file):
         reconstruction = np.dot(U, np.dot(S, V))
         residuals.append(IQ-reconstruction)
         
+        #plt.close()
         fig = plt.figure()
         plt.title('Low rank approximation Using {comps} components\nColour is % of maximum IQ'.format(comps=comps+1))
         plt.imshow((IQ-reconstruction)/np.max(IQ)*100, aspect='auto', extent=[1, len(V), max(Q), min(Q)])
