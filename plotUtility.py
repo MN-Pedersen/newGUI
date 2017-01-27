@@ -17,6 +17,7 @@ import h5py
 import numpy as np
 import seaborn as sns
 sns.set(font_scale=1.4,rc={'image.cmap': 'rainbow'}, style='whitegrid')
+plt.ion()
 
 #%%
 
@@ -105,7 +106,8 @@ def svd_differentials(h5file, delay, colorblind=False):
                 
     U, s, V = np.linalg.svd(IQ)
         
-    #plt.close()  
+    #plt.close()
+    plt.ion()
     fig = plt.figure(figsize=(14,10))
     gs = gridspec.GridSpec(2,2)
         
@@ -142,6 +144,7 @@ def svd_differentials(h5file, delay, colorblind=False):
 def cov_differentials(h5file, delay, colorblind=False):
     Q, IQ = extract_data(h5file, delay) 
     #plt.close()
+    plt.ion()
     fig = plt.figure(figsize=(10,10))
     
     covariance = np.cov(IQ)
@@ -160,6 +163,7 @@ def corr_differentials(h5file, delay, colorblind=False):
     Q, IQ = extract_data(h5file, delay) 
                 
     #plt.close()
+    plt.ion()
     fig = plt.figure(figsize=(12,10))
 
     correlation = np.corrcoef(IQ)
@@ -216,6 +220,7 @@ def hold_out_test(h5file, delay, colorblind=False):
     chis_std = np.array(chis_std)
     
     #plt.close()
+    plt.ion()
     fig = plt.figure()
     plt.title('Signal / Noise holdout test')
     plt.ylabel('Chi-test score')
@@ -237,6 +242,7 @@ def Low_rank_approx(h5file):
     
     U, s, V = np.linalg.svd(IQ)
     residuals = []
+    plt.ion()
     for comps in range(num_comps):
         S = np.zeros((len(U), len(V)))
         S[:comps, :comps] = np.diag(s[:comps])
@@ -254,6 +260,7 @@ def Low_rank_approx(h5file):
         
 
     
+        
         
         
 

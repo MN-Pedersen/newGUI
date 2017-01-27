@@ -238,7 +238,7 @@ def average_and_write(data_path, logfile, run_name,  h5file, Reduction_parameter
                     
                     
                     
-                    
+
                     
         
         
@@ -259,6 +259,7 @@ if __name__ == '__main__':
 #        beam_pos = [959.5, 954.5]
 #        pixel_size = 88.54e-06
 #        return detector_dist, energy, beam_pos, pixel_size
+
     for num, mypath in enumerate(mypaths):
         edf_paths, time_delays, SB_current, SR_current, unique_time_delays = read_log(mypath, logfiles[num])
     

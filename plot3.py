@@ -34,6 +34,7 @@ class CompWindow(QPlotWindow, Ui_PlotWindow):
         super(CompWindow, self).__init__()
         self.setupUi(self)
         # make a plot
+        plt.ioff()
         self.figure = plt.figure()
         self.canvas = FigureCanvas(self.figure)
         #self.axes = self.figure.add_subplot(111)
@@ -187,6 +188,12 @@ class CompWindow(QPlotWindow, Ui_PlotWindow):
            y_axis = 'q**2*dS(q, t), a.u.'
            self.dsq_state = 3
         return y_axis
+        
+    def closeEvent(self, event):
+        print('Closing SVD widget')
+        plt.close()
+        event.accept()
+        
         
         
             
