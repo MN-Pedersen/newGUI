@@ -116,7 +116,7 @@ class Main(QPlotWindow, Ui_PlotWindow):
         else:
             destination_folder = self.hdf5_append
         self.h5file = destination_folder + separator + self.sample_name
-        print(self.h5file)        
+        #print(self.h5file)        
         
         
         

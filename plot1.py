@@ -36,6 +36,7 @@ class PlotWindow(QPlotWindow, Ui_PlotWindow):
     def __init__(self, plot_data):
         super(PlotWindow, self).__init__()
         self.setupUi(self)
+        plt.ioff()
         # make a plot
         self.figure = plt.figure()
         #self.setCentralWidget(self.figure)
@@ -63,10 +64,12 @@ class PlotWindow(QPlotWindow, Ui_PlotWindow):
         self.Use_errorbars = False
         
         
+        
         # Avoid reading the y and x axis limits on first pass. This is necessary
         # because PlotListUpdate is passed before Add_plot due to the 
         # CurvesToPlot-PlotListUpdate connection above
         self.First_round_check = True
+        
         
         
         
@@ -205,5 +208,10 @@ class PlotWindow(QPlotWindow, Ui_PlotWindow):
         for k, item in enumerate(self.file_names):
             self.CurvesToPlot.addItem(item)
             self.CurvesToPlot.item(k).setCheckState(QtCore.Qt.Checked)
+    
+    def closeEvent(self, event):
+        print('Closing main plot window')
+        plt.close()
+        event.accept()
         
         
